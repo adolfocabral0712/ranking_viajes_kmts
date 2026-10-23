@@ -327,7 +327,8 @@ dialog::backdrop{background:#18324770}
     <strong>Índice diario:</strong>
     km por día-camión de la empresa ÷ km por día-camión general.
     Un índice de 1,50 significa 50 % por encima de la referencia.
-    Se utilizan los valores completos para ordenar; solo se redondea la presentación.
+    Se utilizan los valores completos para ordenar;
+    solo se redondea la presentación.
    </p>
    <p>
     Los días sin viajes quedan fuera del indicador diario.
@@ -406,8 +407,8 @@ dialog::backdrop{background:#18324770}
 <script>
 'use strict';
 
-const URL_JSON =
-'https://dl.dropbox.com/scl/fi/c6r2wfa9wkl5ciwz30si8/RankingViajesDistancia.json?rlkey=m5t2qg20chg818ydyi8axcir3&dl=1';
+// El enlace de Dropbox se configura solamente como Secret del Worker.
+const URL_JSON = '/api/ranking';
 
 const $ = id => document.getElementById(id);
 
@@ -537,10 +538,6 @@ function companyForRow(row){
  return names.join(' / ') || 'Sin empresa informada';
 }
 
-/*
- Una combinación matrícula-fecha representa un día-camión.
- Se usa la fecha real del viaje, no el mes operativo.
-*/
 function truckDayKey(row){
  return JSON.stringify([row.matricula,row.fecha]);
 }
@@ -731,11 +728,7 @@ function calculateCompanies(){
    ...group,
    pct_km:shareKm*100,
    pct_matriculas:shareFleet*100,
-
-   // Participación de km respecto a participación de matrículas.
    indice:shareFleet ? shareKm/shareFleet : 0,
-
-   // Intensidad diaria respecto al promedio general.
    indice_diario:total.km_dia_camion
     ? group.km_dia_camion/total.km_dia_camion : 0
   };
@@ -1315,12 +1308,26 @@ async function load(){
 
  try{
   const response = await fetch(URL_JSON,{
-   cache:'no-store',signal:controller.signal
+   cache:'no-store',
+   signal:controller.signal,
+   headers:{Accept:'application/json'}
   });
 
-  if(!response.ok) throw Error('HTTP '+response.status);
+  let data;
 
-  const data = await response.json();
+  try{
+   data = await response.json();
+  }catch{
+   throw Error(
+    'El servidor no devolvió un JSON válido. '+
+    'Verificá el despliegue del Worker.'
+   );
+  }
+
+  if(!response.ok){
+   throw Error(data.error || 'HTTP '+response.status);
+  }
+
   const parsed = validate(data);
 
   rows = parsed;
