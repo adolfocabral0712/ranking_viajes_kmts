@@ -9,14 +9,14 @@
 :root{--green:#164b3c;--border:#dbe5df;--muted:#65796e}
 *{box-sizing:border-box}
 body{margin:0;background:#f2f6f3;color:#21372b;font:14px Arial,sans-serif}
-main{max-width:1500px;margin:auto;padding:24px}
+main{max-width:1600px;margin:auto;padding:24px}
 header,.tools{display:flex;align-items:center;justify-content:space-between;gap:12px}
 h1{margin:0 0 7px;font-size:26px}
 h2{font-size:19px;margin:0}
 p{color:var(--muted);line-height:1.5;margin:6px 0}
 button,input{font:inherit;padding:10px;border:1px solid var(--border);border-radius:7px;background:white;color:#21372b}
 button{cursor:pointer}
-button.primary,button.active{background:var(--green);color:white}
+button.primary{background:var(--green);color:white}
 button:disabled{opacity:.45;cursor:default}
 .filters,.panel,.card{background:white;border:1px solid var(--border);border-radius:12px}
 .filters{padding:14px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:20px 0 18px;position:relative}
@@ -35,20 +35,21 @@ button:disabled{opacity:.45;cursor:default}
 .card{text-align:center;padding:16px;border-top:3px solid var(--green)}
 .card span{font-size:12px;color:var(--muted)}
 .card strong{display:block;font-size:25px;margin-top:8px}
+.rankings-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
 .tools{padding:14px;flex-wrap:wrap}
-.switch{display:flex;gap:6px}
+.tools button{font-size:12px;padding:8px}
 .scroll{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{text-align:center;padding:12px 8px;border-bottom:1px solid #e5ece7}
+th,td{text-align:center;padding:10px 5px;border-bottom:1px solid #e5ece7}
 th{background:var(--green);color:white;position:sticky;top:0;z-index:1}
-th button{border:0;background:none;color:inherit;font-size:12px;font-weight:bold;padding:0}
 tbody tr:nth-child(even){background:#f7faf8}
 tbody tr:hover{background:#eef5f0}
 td.long{overflow-wrap:anywhere}
 tfoot{font-weight:bold;background:#e4eee8}
 .ranking-table{table-layout:fixed;width:100%}
 .ranking-table th,.ranking-table td{white-space:normal;overflow-wrap:anywhere}
-.rank-link{display:inline-block;color:var(--green);font-weight:bold;text-decoration:underline;text-underline-offset:3px;padding:5px 10px;border-radius:5px}
+.metric{font-weight:bold;color:var(--green);background:#eaf3ed}
+.rank-link{display:inline-block;color:var(--green);font-weight:bold;text-decoration:underline;text-underline-offset:3px;padding:5px 7px;border-radius:5px}
 .rank-link:hover{background:#dcece2}
 #status{margin:12px 0;line-height:1.5}
 .error{color:#a52e2e}
@@ -65,6 +66,9 @@ dialog::backdrop{background:#122d2466}
 #detail-csv{margin-top:14px}
 .small{font-size:11px}
 
+@media(max-width:1000px){
+ .rankings-grid{grid-template-columns:1fr}
+}
 @media(max-width:950px){
  .filters{grid-template-columns:repeat(3,minmax(0,1fr))}
  .cards{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -78,8 +82,7 @@ dialog::backdrop{background:#122d2466}
  .multi:nth-child(even) .popup{left:auto;right:0}
  table{font-size:11px}
  th,td{padding:9px 4px}
- .tools{align-items:flex-start;flex-direction:column}
- .rank-link{padding:5px 3px}
+ .rank-link{padding:5px 2px}
 }
 </style>
 </head>
@@ -127,41 +130,66 @@ dialog::backdrop{background:#122d2466}
  Cargando viajes y distancias…
 </div>
 
-<section class="panel">
- <div class="tools">
-  <b id="count">Ranking por matrícula</b>
+<section class="rankings-grid">
 
-  <div class="switch">
-   <button id="by-km" class="active" aria-pressed="true">
-    Por kilómetros
-   </button>
-   <button id="by-trips" aria-pressed="false">
-    Por viajes
-   </button>
+ <section class="panel">
+  <div class="tools">
+   <div>
+    <h2>Por kilómetros</h2>
+    <p class="small" id="km-count">Ranking por matrícula</p>
+   </div>
+   <button id="km-csv" disabled>Exportar CSV</button>
   </div>
 
-  <button id="csv" disabled>Exportar ranking CSV</button>
- </div>
+  <div class="scroll">
+   <table class="ranking-table">
+    <colgroup>
+     <col style="width:7%">
+     <col style="width:14%">
+     <col style="width:29%">
+     <col style="width:13%">
+     <col style="width:21%">
+     <col style="width:16%">
+    </colgroup>
+    <thead><tr id="km-headers"></tr></thead>
+    <tbody id="km-body"></tbody>
+    <tfoot id="km-footer"></tfoot>
+   </table>
+  </div>
+ </section>
 
- <div class="scroll">
-  <table class="ranking-table">
-   <colgroup>
-    <col style="width:7%">
-    <col style="width:13%">
-    <col style="width:33%">
-    <col style="width:12%">
-    <col style="width:19%">
-    <col style="width:16%">
-   </colgroup>
-   <thead><tr id="headers"></tr></thead>
-   <tbody id="body"></tbody>
-   <tfoot id="footer"></tfoot>
-  </table>
- </div>
+ <section class="panel">
+  <div class="tools">
+   <div>
+    <h2>Por viajes</h2>
+    <p class="small" id="trips-count">Ranking por matrícula</p>
+   </div>
+   <button id="trips-csv" disabled>Exportar CSV</button>
+  </div>
+
+  <div class="scroll">
+   <table class="ranking-table">
+    <colgroup>
+     <col style="width:7%">
+     <col style="width:14%">
+     <col style="width:29%">
+     <col style="width:13%">
+     <col style="width:21%">
+     <col style="width:16%">
+    </colgroup>
+    <thead><tr id="trips-headers"></tr></thead>
+    <tbody id="trips-body"></tbody>
+    <tfoot id="trips-footer"></tfoot>
+   </table>
+  </div>
+ </section>
+
 </section>
 
 <p class="note">
- Pulsá el número de puesto para consultar los orígenes y viajes del camión.
+ Pulsá el número de puesto de cualquiera de las tablas para ver
+ los orígenes y viajes del camión.
+ Ambas tablas utilizan los mismos filtros.
  Solo entradas desde 01/01/2025 con distancia positiva,
  matrícula válida y origen informado.
  Viaje estimado: misma matrícula, día, origen y depósito,
@@ -169,8 +197,8 @@ dialog::backdrop{background:#122d2466}
  Se suman las toneladas y se toma la mayor distancia una sola vez.
  El agrupamiento se realiza antes de filtrar.
  Los kilómetros son distancias de ruta registradas, no mediciones GPS.
- Un filtro de fletero incluye el viaje completo si contiene alguna
- de las opciones seleccionadas.
+ Un filtro de fletero incluye el viaje completo si contiene
+ alguna de las opciones seleccionadas.
 </p>
 
 </main>
@@ -312,8 +340,6 @@ const integer=new Intl.NumberFormat('es-UY');
 let rows=[];
 let filtered=[];
 let ranking=[];
-let sortKey='km';
-let direction=-1;
 let loaded=false;
 let busy=false;
 let detailRows=[];
@@ -388,7 +414,7 @@ function display(k,v){
 }
 
 // ============================================================
-// FILTROS
+// FILTROS MÚLTIPLES
 // ============================================================
 
 function filterVisible(k){
@@ -454,7 +480,8 @@ function options(){
       .join(', ');
   }
 
-  $('summary-'+k).textContent=labels[k]+': '+description;
+  $('summary-'+k).textContent=
+   labels[k]+': '+description;
 
   filterVisible(k);
  }
@@ -585,43 +612,31 @@ function totals(source){
 }
 
 // ============================================================
-// RANKING COMPLETO, SIN PAGINACIÓN
+// DOS RANKINGS INDEPENDIENTES
 // ============================================================
 
-function render(){
- ranking.sort((a,b)=>{
-  const diff=['matricula','fleteros'].includes(sortKey)
-   ?compare(a[sortKey],b[sortKey])
-   :a[sortKey]-b[sortKey];
+function orderedRanking(metric){
+ return [...ranking].sort((a,b)=>{
+  if(metric==='km'){
+   return b.km-a.km||
+    b.viajes-a.viajes||
+    compare(a.matricula,b.matricula);
+  }
 
-  return direction*diff||
+  return b.viajes-a.viajes||
    b.km-a.km||
-   b.viajes-a.viajes||
    compare(a.matricula,b.matricula);
  });
+}
 
- const t=totals(filtered);
+function renderRanking(prefix,metric){
+ const list=orderedRanking(metric);
+ const body=$(prefix+'-body');
 
- $('k-plates').textContent=
-  loaded?integer.format(ranking.length):'—';
+ body.replaceChildren();
 
- $('k-trips').textContent=
-  loaded?integer.format(t.viajes):'—';
-
- $('k-km').textContent=
-  loaded?fmt.format(t.km):'—';
-
- $('k-tons').textContent=
-  loaded?fmt.format(t.tons):'—';
-
- $('k-average').textContent=
-  loaded?fmt.format(t.km_viaje):'—';
-
- $('body').replaceChildren();
-
- ranking.forEach((g,i)=>{
+ list.forEach((g,i)=>{
   const tr=document.createElement('tr');
-
   const position=td(tr,'');
 
   const link=document.createElement('a');
@@ -645,14 +660,14 @@ function render(){
    td(
     tr,
     display(k,g[k]),
-    k==='fleteros'?'long':''
+    k===metric?'metric':k==='fleteros'?'long':''
    );
   }
 
-  $('body').append(tr);
+  body.append(tr);
  });
 
- if(!ranking.length){
+ if(!list.length){
   const tr=document.createElement('tr');
 
   const cell=td(
@@ -663,51 +678,47 @@ function render(){
   );
 
   cell.colSpan=6;
-  $('body').append(tr);
+  body.append(tr);
  }
 
- const totalRow=document.createElement('tr');
- const title=td(totalRow,'TOTAL FILTRADO');
+ const t=totals(filtered);
+
+ const tr=document.createElement('tr');
+ const title=td(tr,'TOTAL FILTRADO');
  title.colSpan=3;
 
  for(const k of ['viajes','km','km_viaje']){
-  td(totalRow,display(k,t[k]));
+  td(tr,display(k,t[k]));
  }
 
- $('footer').replaceChildren(totalRow);
+ $(prefix+'-footer').replaceChildren(tr);
 
- $('csv').disabled=!ranking.length;
+ $(prefix+'-count').textContent=
+  integer.format(list.length)+' camiones · mayor a menor';
 
- $('count').textContent=
-  'Ranking por matrícula · '+ranking.length+' camiones';
+ $(prefix+'-csv').disabled=!list.length;
+}
 
- document.querySelectorAll(
-  '#headers th[data-key]'
- ).forEach(th=>{
-  const key=th.dataset.key;
+function render(){
+ const t=totals(filtered);
 
-  th.firstChild.textContent=
-   headings[cols.indexOf(key)]+
-   (sortKey===key?(direction===1?' ▲':' ▼'):'');
+ $('k-plates').textContent=
+  loaded?integer.format(ranking.length):'—';
 
-  th.setAttribute(
-   'aria-sort',
-   sortKey===key
-    ?direction===1?'ascending':'descending'
-    :'none'
-  );
- });
+ $('k-trips').textContent=
+  loaded?integer.format(t.viajes):'—';
 
- for(const [id,key] of [
-  ['by-km','km'],
-  ['by-trips','viajes']
- ]){
-  $(id).classList.toggle('active',sortKey===key);
-  $(id).setAttribute(
-   'aria-pressed',
-   String(sortKey===key)
-  );
- }
+ $('k-km').textContent=
+  loaded?fmt.format(t.km):'—';
+
+ $('k-tons').textContent=
+  loaded?fmt.format(t.tons):'—';
+
+ $('k-average').textContent=
+  loaded?fmt.format(t.km_viaje):'—';
+
+ renderRanking('km','km');
+ renderRanking('trips','viajes');
 }
 
 function apply(){
@@ -747,7 +758,7 @@ function apply(){
 }
 
 // ============================================================
-// DETALLE COMPLETO POR MATRÍCULA
+// DETALLE DE ORÍGENES Y VIAJES
 // ============================================================
 
 function renderDetail(){
@@ -852,6 +863,38 @@ function csvFile(name,headers,data){
 
 function csvNumber(v){
  return Number(v).toFixed(2).replace('.',',');
+}
+
+function exportRanking(metric){
+ const t=totals(filtered);
+ const list=orderedRanking(metric);
+
+ csvFile(
+  metric==='km'
+   ?'RankingPorKilometros.csv'
+   :'RankingPorViajes.csv',
+
+  ['Puesto',...headings],
+
+  [
+   ...list.map((r,i)=>[
+    i+1,
+    ...cols.map(k=>
+     ['matricula','fleteros'].includes(k)
+      ?r[k]
+      :k==='viajes'?r[k]:csvNumber(r[k])
+    )
+   ]),
+   [
+    '',
+    'TOTAL FILTRADO',
+    '',
+    t.viajes,
+    csvNumber(t.km),
+    csvNumber(t.km_viaje)
+   ]
+  ]
+ );
 }
 
 // ============================================================
@@ -1015,32 +1058,34 @@ async function load(){
 }
 
 // ============================================================
-// ENCABEZADOS ORDENABLES
+// ENCABEZADOS DE AMBAS TABLAS
 // ============================================================
 
-const first=document.createElement('th');
-first.textContent='Puesto';
-$('headers').append(first);
+for(const [prefix,metric] of [
+ ['km','km'],
+ ['trips','viajes']
+]){
+ const first=document.createElement('th');
+ first.textContent='Puesto';
+ $(prefix+'-headers').append(first);
 
-cols.forEach((key,i)=>{
- const th=document.createElement('th');
- th.dataset.key=key;
+ cols.forEach((key,i)=>{
+  const th=document.createElement('th');
 
- const button=document.createElement('button');
- button.textContent=headings[i];
+  th.textContent=
+   headings[i]+(key===metric?' ▼':'');
 
- button.onclick=()=>{
-  direction=sortKey===key
-   ?-direction
-   :['matricula','fleteros'].includes(key)?1:-1;
+  if(key===metric){
+   th.setAttribute('aria-sort','descending');
+  }
 
-  sortKey=key;
-  render();
+  $(prefix+'-headers').append(th);
+ });
+
+ $(prefix+'-csv').onclick=()=>{
+  exportRanking(metric);
  };
-
- th.append(button);
- $('headers').append(th);
-});
+}
 
 // ============================================================
 // EVENTOS
@@ -1058,50 +1103,11 @@ $('clear').onclick=()=>{
  apply();
 };
 
-$('by-km').onclick=()=>{
- sortKey='km';
- direction=-1;
- render();
-};
-
-$('by-trips').onclick=()=>{
- sortKey='viajes';
- direction=-1;
- render();
-};
-
 $('detail-close').onclick=()=>{
  $('details').close();
 };
 
 $('refresh').onclick=load;
-
-$('csv').onclick=()=>{
- const t=totals(filtered);
-
- csvFile(
-  'RankingViajesDistancia.csv',
-  ['Puesto',...headings],
-  [
-   ...ranking.map((r,i)=>[
-    i+1,
-    ...cols.map(k=>
-     ['matricula','fleteros'].includes(k)
-      ?r[k]
-      :k==='viajes'?r[k]:csvNumber(r[k])
-    )
-   ]),
-   [
-    '',
-    'TOTAL FILTRADO',
-    '',
-    t.viajes,
-    csvNumber(t.km),
-    csvNumber(t.km_viaje)
-   ]
-  ]
- );
-};
 
 $('detail-csv').onclick=()=>{
  csvFile(
