@@ -28,13 +28,22 @@ button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible{
  outline:2px solid var(--blue);outline-offset:3px;
 }
 [hidden]{display:none!important}
-.view-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:22px}
-.view-card{text-align:left;padding:17px 20px;border:2px solid var(--border);border-radius:11px}
+.view-cards{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:14px;margin-top:22px;
+}
+.view-card{
+ text-align:left;padding:17px 20px;
+ border:2px solid var(--border);border-radius:11px;
+}
 .view-card strong{display:block;font-size:18px}
 .view-card span{display:block;margin-top:5px;font-size:12px;color:var(--muted)}
 .view-card.active{border-color:var(--teal);background:#EAF5F2}
 .view-card.active strong{color:var(--teal)}
-.filters{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin:20px 0 18px}
+.filters{
+ display:grid;grid-template-columns:repeat(6,minmax(0,1fr));
+ gap:12px;margin:20px 0 18px;
+}
 .multi{position:relative;min-width:0;background:white;border-radius:9px}
 .multi summary{
  font-weight:600;padding:14px;border:1px solid var(--border);
@@ -52,13 +61,22 @@ button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible{
 .filter-actions{display:flex;gap:7px}
 .filter-actions button{flex:1;font-size:11px;padding:8px}
 .choices{max-height:260px;overflow:auto;margin-top:8px}
-.choice{display:flex;gap:9px;padding:9px 4px;align-items:center;cursor:pointer;font-size:12px}
+.choice{
+ display:flex;gap:9px;padding:9px 4px;align-items:center;
+ cursor:pointer;font-size:12px;
+}
 .choice:hover{background:#F0F5F8}
-.choice input{accent-color:var(--blue);width:17px;height:17px;padding:0;margin:0}
-.cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.choice input{
+ accent-color:var(--blue);width:17px;height:17px;padding:0;margin:0;
+}
+.cards{
+ display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
+ gap:14px;margin-bottom:18px;
+}
 .card{
- background:white;border:1px solid var(--border);border-top:4px solid var(--navy);
- border-radius:10px;text-align:center;padding:20px 12px;
+ background:white;border:1px solid var(--border);
+ border-top:4px solid var(--navy);border-radius:10px;
+ text-align:center;padding:20px 12px;
 }
 .card:nth-child(2),.card:nth-child(3){border-top-color:var(--teal)}
 .card:nth-child(4){border-top-color:var(--blue)}
@@ -67,15 +85,29 @@ button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible{
  display:block;font-size:27px;color:var(--navy);
  margin-top:9px;font-variant-numeric:tabular-nums;
 }
-.rankings-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start}
-.panel{background:white;border:1px solid var(--border);border-radius:11px;overflow:hidden}
+.rankings-grid{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:20px;align-items:start;
+}
+.panel{
+ background:white;border:1px solid var(--border);
+ border-radius:11px;overflow:hidden;
+}
 .tools{padding:19px 16px;flex-wrap:wrap}
 .tools button{font-size:12px;padding:8px 10px}
 .small{font-size:11px}
 .scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:12px;line-height:1.1}
-th,td{text-align:center;padding:6px 4px;border-bottom:1px solid #E8EDF1;overflow-wrap:anywhere}
-th{background:var(--teal);color:white;padding-top:4px;padding-bottom:4px;line-height:1.15}
+table{
+ width:100%;border-collapse:collapse;font-size:12px;line-height:1.1;
+}
+th,td{
+ text-align:center;padding:6px 4px;
+ border-bottom:1px solid #E8EDF1;overflow-wrap:anywhere;
+}
+th{
+ background:var(--teal);color:white;
+ padding-top:4px;padding-bottom:4px;line-height:1.15;
+}
 .trips-panel th{background:var(--blue)}
 tbody tr:nth-child(even){background:#FAFBFC}
 tbody tr:hover{background:#F0F5F8}
@@ -93,7 +125,9 @@ tfoot{font-weight:700;background:#EAF0F5;color:var(--navy)}
 .company-name{text-align:left}
 .index-good{color:#176B67;font-weight:700}
 .index-low{color:#A46B21;font-weight:700}
-#status{margin:12px 0 18px;font-size:12px;line-height:1.5;color:var(--muted)}
+#status{
+ margin:12px 0 18px;font-size:12px;line-height:1.5;color:var(--muted);
+}
 #status.error{color:#A52E2E}
 .note{font-size:12px;margin-top:16px}
 .reference{
@@ -101,7 +135,9 @@ tfoot{font-weight:700;background:#EAF0F5;color:var(--navy)}
  border-radius:7px;font-size:12px;line-height:1.6;
 }
 .company-actions{display:flex;gap:7px;flex-wrap:wrap}
-.sort-active{background:var(--teal)!important;color:white;border-color:var(--teal)}
+.sort-active{
+ background:var(--teal)!important;color:white;border-color:var(--teal);
+}
 #company-table{min-width:1100px;font-size:11px}
 dialog{
  border:1px solid var(--border);border-radius:13px;
@@ -119,35 +155,87 @@ dialog::backdrop{background:#18324770}
 #detail-csv{margin-top:16px}
 .detail-scroll table{min-width:760px}
 .pill{display:block;font-size:10px;color:#946210;margin-top:2px}
-.podium{display:flex;align-items:flex-end;justify-content:center;gap:10px;padding:2px 22px 0;min-height:245px}
-.podium-spot{
- flex:1;min-width:0;max-width:210px;display:flex;flex-direction:column;
- align-items:stretch;padding:0;border:0;background:transparent;text-align:center;
+
+/* Podios */
+.podium{
+ display:flex;align-items:flex-end;justify-content:center;
+ gap:10px;padding:2px 22px 0;min-height:245px;
 }
+.podium-spot{
+ flex:1;min-width:0;max-width:210px;
+ display:flex;flex-direction:column;align-items:stretch;
+ padding:0;border:0;background:transparent;text-align:center;
+}
+.podium-spot:hover{background:#F3F7FA}
 .podium-medal{height:34px;font-size:24px;line-height:32px}
 .podium-place-1 .podium-medal{font-size:30px}
-.podium-meta{display:flex;flex-direction:column;align-items:center;padding:0 3px 10px;min-height:93px}
+.podium-meta{
+ display:flex;flex-direction:column;align-items:center;
+ padding:0 3px 10px;min-height:93px;
+}
 .podium-plate{font-size:18px;text-decoration:underline}
 .podium-company{
  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
  overflow:hidden;font-size:11px;line-height:1.3;min-height:29px;
  color:var(--muted);margin:4px 0;
 }
-.podium-value{font-size:17px;font-weight:750;color:var(--teal);white-space:nowrap}
+.podium-value{
+ font-size:17px;font-weight:750;color:var(--teal);white-space:nowrap;
+}
 .trips-panel .podium-value{color:var(--blue)}
 .podium-block{
  display:flex;align-items:center;justify-content:center;
  border:1px solid;border-bottom:0;border-radius:6px 6px 0 0;
 }
 .podium-block span{font-size:42px;font-weight:750}
-.podium-place-1 .podium-block{height:118px;background:#EFE2B4;border-color:#C1A15A;color:#896514}
-.podium-place-2 .podium-block{height:83px;background:#E2E8EE;border-color:#A2B0BE;color:#52677A}
-.podium-place-3 .podium-block{height:61px;background:#E8D3C4;border-color:#BD9780;color:#8C5C40}
+.podium-place-1 .podium-block{
+ height:118px;background:#EFE2B4;border-color:#C1A15A;color:#896514;
+}
+.podium-place-2 .podium-block{
+ height:83px;background:#E2E8EE;border-color:#A2B0BE;color:#52677A;
+}
+.podium-place-3 .podium-block{
+ height:61px;background:#E8D3C4;border-color:#BD9780;color:#8C5C40;
+}
 .podium-missing{opacity:.32}
-.podium-hint{font-size:10px;text-align:center;margin:0;padding:8px 12px 12px;border-top:2px solid var(--border)}
+.podium-hint{
+ font-size:10px;text-align:center;margin:0;padding:8px 12px 12px;
+ border-top:2px solid var(--border);
+}
 .podium-message{padding:25px;font-size:12px}
-@media(max-width:1000px){.rankings-grid{grid-template-columns:1fr}}
-@media(max-width:950px){.filters,.cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* Dos podios de empresas simultáneos */
+.company-podiums{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:16px;margin:0 16px 18px;
+}
+.company-podium-panel{
+ border:1px solid var(--border);border-radius:10px;
+ overflow:hidden;background:white;
+}
+.company-podium-title{
+ margin:0;padding:16px 14px 4px;font-size:17px;color:var(--teal);
+}
+.company-podium-panel.trips-panel .company-podium-title{
+ color:var(--blue);
+}
+.company-podium-subtitle{padding:0 14px;font-size:11px}
+.company-podiums .podium{min-height:270px}
+.company-podiums .podium-meta{min-height:122px}
+.company-podiums .podium-plate{
+ font-size:13px;line-height:1.3;min-height:51px;
+ display:-webkit-box;-webkit-line-clamp:3;
+ -webkit-box-orient:vertical;overflow:hidden;
+}
+.company-podiums .podium-company{min-height:15px;font-size:11px}
+.company-podiums .podium-value{font-size:23px}
+
+@media(max-width:1000px){
+ .rankings-grid,.company-podiums{grid-template-columns:1fr}
+}
+@media(max-width:950px){
+ .filters,.cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
 @media(max-width:650px){
  main{padding:12px}
  header{align-items:flex-start;flex-direction:column}
@@ -169,6 +257,8 @@ dialog::backdrop{background:#18324770}
  .podium-place-1 .podium-block{height:100px}
  .podium-place-2 .podium-block{height:72px}
  .podium-place-3 .podium-block{height:52px}
+ .company-podiums{margin-left:10px;margin-right:10px}
+ .company-podiums .podium-company{font-size:10px}
 }
 </style>
 </head>
@@ -276,19 +366,46 @@ dialog::backdrop{background:#18324770}
 
   <div class="reference" id="company-reference">Esperando datos…</div>
 
+  <section class="company-podiums" aria-label="Podios de empresas">
+   <section class="company-podium-panel">
+    <h3 class="company-podium-title">Podio · Índice total</h3>
+    <p class="company-podium-subtitle">
+     % de kilómetros ÷ % de matrículas
+    </p>
+    <div
+     class="podium"
+     id="company-total-podium"
+     aria-label="Podio de empresas por índice total"
+    ></div>
+    <p class="podium-hint">
+     Seleccioná una empresa para consultar sus viajes
+    </p>
+   </section>
+
+   <section class="company-podium-panel trips-panel">
+    <h3 class="company-podium-title">Podio · Índice diario</h3>
+    <p class="company-podium-subtitle">
+     Km por día-camión respecto al promedio general
+    </p>
+    <div
+     class="podium"
+     id="company-daily-podium"
+     aria-label="Podio de empresas por índice diario"
+    ></div>
+    <p class="podium-hint">
+     Seleccioná una empresa para consultar sus viajes
+    </p>
+   </section>
+  </section>
+
   <div class="scroll">
    <table id="company-table" class="ranking-table">
     <colgroup>
-     <col style="width:4%">
-     <col style="width:20%">
-     <col style="width:8%">
-     <col style="width:8%">
-     <col style="width:10%">
-     <col style="width:8%">
-     <col style="width:8%">
-     <col style="width:6%">
-     <col style="width:8%">
-     <col style="width:11%">
+     <col style="width:4%"><col style="width:20%">
+     <col style="width:8%"><col style="width:8%">
+     <col style="width:10%"><col style="width:8%">
+     <col style="width:8%"><col style="width:6%">
+     <col style="width:8%"><col style="width:11%">
      <col style="width:9%">
     </colgroup>
     <thead><tr>
@@ -316,7 +433,7 @@ dialog::backdrop{background:#18324770}
    </p>
    <p>
     <strong>Días-camión:</strong>
-    cantidad de combinaciones distintas de matrícula y fecha con viajes.
+    combinaciones distintas de matrícula y fecha con viajes.
     Un camión con varios viajes en el mismo día cuenta una sola vez.
    </p>
    <p>
@@ -331,8 +448,12 @@ dialog::backdrop{background:#18324770}
     solo se redondea la presentación.
    </p>
    <p>
+    Ambos podios se calculan por separado y se muestran simultáneamente.
+    Los botones cambian únicamente el orden de la tabla y su CSV.
+   </p>
+   <p>
     Los días sin viajes quedan fuera del indicador diario.
-    El dato no permite determinar si hubo descanso, avería o falta de carga.
+    No se puede determinar si hubo descanso, avería o falta de carga.
     Las diferencias de rutas también influyen en los kilómetros.
    </p>
    <p>
@@ -407,9 +528,7 @@ dialog::backdrop{background:#18324770}
 <script>
 'use strict';
 
-// El enlace de Dropbox se configura solamente como Secret del Worker.
 const URL_JSON = '/api/ranking';
-
 const $ = id => document.getElementById(id);
 
 const months = [
@@ -463,9 +582,9 @@ function compare(a,b){
 }
 
 function valueLabel(key,value){
- if(key === 'mes_numero') return months[Number(value)-1] || value;
- if(key === 'quincena'){
-  return value === '1'
+ if(key==='mes_numero') return months[Number(value)-1] || value;
+ if(key==='quincena'){
+  return value==='1'
    ? 'Quincena 1 (26–10)'
    : 'Quincena 2 (11–25)';
  }
@@ -515,9 +634,9 @@ function periodForDate(value){
  const date = new Date(Date.UTC(year,month-1,day));
 
  if(
-  date.getUTCFullYear() !== year ||
-  date.getUTCMonth() !== month-1 ||
-  date.getUTCDate() !== day
+  date.getUTCFullYear()!==year ||
+  date.getUTCMonth()!==month-1 ||
+  date.getUTCDate()!==day
  ) throw Error('Fecha inválida: '+value);
 
  const period = new Date(Date.UTC(year,month-1+(day>=26?1:0),1));
@@ -565,15 +684,13 @@ function renderFilterOptions(){
 
    const input = document.createElement('input');
    input.type = 'checkbox';
-   input.checked = selected[key] === null || selected[key].has(value);
+   input.checked = selected[key]===null || selected[key].has(value);
 
    input.onchange = () => {
-    if(selected[key] === null) selected[key] = new Set(all);
-
+    if(selected[key]===null) selected[key] = new Set(all);
     if(input.checked) selected[key].add(value);
     else selected[key].delete(value);
-
-    if(selected[key].size === all.length) selected[key] = null;
+    if(selected[key].size===all.length) selected[key] = null;
     apply();
    };
 
@@ -583,9 +700,9 @@ function renderFilterOptions(){
    container.append(label);
   }
 
-  const description = selected[key] === null
+  const description = selected[key]===null
    ? 'Todos'
-   : selected[key].size === 0
+   : selected[key].size===0
     ? 'Ninguno'
     : [...selected[key]].sort(compare)
        .map(value => valueLabel(key,value)).join(', ');
@@ -649,7 +766,7 @@ function buildFilters(){
  });
 
  document.addEventListener('keydown',event => {
-  if(event.key === 'Escape'){
+  if(event.key==='Escape'){
    document.querySelectorAll('.multi[open]')
     .forEach(details => details.open = false);
   }
@@ -735,9 +852,13 @@ function calculateCompanies(){
  });
 }
 
-function orderedCompanies(){
+/*
+ Cada podio pasa su propio indicador.
+ El orden de la tabla utiliza companySort.
+*/
+function orderedCompanies(metric=companySort){
  return [...companyRanking].sort((a,b) =>
-  b[companySort]-a[companySort] ||
+  b[metric]-a[metric] ||
   b.km-a.km ||
   b.viajes-a.viajes ||
   compare(a.id,b.id)
@@ -746,7 +867,7 @@ function orderedCompanies(){
 
 function orderedPlates(metric){
  return [...plateRanking].sort((a,b) =>
-  metric === 'km'
+  metric==='km'
    ? b.km-a.km || b.viajes-a.viajes || compare(a.id,b.id)
    : b.viajes-a.viajes || b.km-a.km || compare(a.id,b.id)
  );
@@ -769,6 +890,7 @@ function renderPodium(prefix,metric,list){
   const position = index+1;
   const group = list[index];
   const button = document.createElement('button');
+  button.type = 'button';
   button.className = 'podium-spot podium-place-'+position;
 
   if(group){
@@ -782,6 +904,7 @@ function renderPodium(prefix,metric,list){
   const medal = document.createElement('span');
   medal.className = 'podium-medal';
   medal.textContent = ['🏆','🥈','🥉'][index];
+  medal.setAttribute('aria-hidden','true');
 
   const meta = document.createElement('span');
   meta.className = 'podium-meta';
@@ -811,6 +934,84 @@ function renderPodium(prefix,metric,list){
 
   button.append(medal,meta,block);
   container.append(button);
+ }
+}
+
+function renderCompanyPodium(containerId,metric){
+ const container = $(containerId);
+ container.replaceChildren();
+
+ const list = orderedCompanies(metric).slice(0,3);
+
+ if(!list.length){
+  const message = document.createElement('p');
+  message.className = 'podium-message';
+  message.textContent = loaded
+   ? 'Sin empresas para estos filtros.' : 'Esperando datos…';
+  container.append(message);
+  return;
+ }
+
+ for(const index of [1,0,2]){
+  const rank = index+1;
+  const group = list[index];
+
+  const spot = document.createElement('button');
+  spot.type = 'button';
+  spot.className = 'podium-spot podium-place-'+rank;
+
+  if(group){
+   spot.setAttribute(
+    'aria-label',
+    'Puesto '+rank+': '+group.id+
+    '. Índice '+decimal.format(group[metric])+'. Ver detalle.'
+   );
+   spot.onclick = () => openCompany(group.id);
+  }else{
+   spot.disabled = true;
+   spot.classList.add('podium-missing');
+   spot.setAttribute('aria-label','Sin empresa para el puesto '+rank);
+  }
+
+  const medal = document.createElement('span');
+  medal.className = 'podium-medal';
+  medal.textContent = ['🏆','🥈','🥉'][index];
+  medal.setAttribute('aria-hidden','true');
+
+  const meta = document.createElement('span');
+  meta.className = 'podium-meta';
+
+  const name = document.createElement('strong');
+  name.className = 'podium-plate';
+  name.textContent = group ? group.id : '—';
+  name.title = group ? group.id : '';
+
+  const detail = document.createElement('span');
+  detail.className = 'podium-company';
+  detail.textContent = group
+   ? integer.format(group.matriculas)+' matrículas · '+
+     integer.format(group.viajes)+' viajes'
+   : 'Sin datos';
+
+  const value = document.createElement('span');
+  value.className = 'podium-value';
+  value.textContent = group ? decimal.format(group[metric]) : '—';
+
+  if(group){
+   value.title = indexDescription(group[metric]);
+  }
+
+  meta.append(name,detail,value);
+
+  const block = document.createElement('span');
+  block.className = 'podium-block';
+
+  const number = document.createElement('span');
+  number.textContent = rank;
+  block.append(number);
+
+  spot.append(medal,meta,block);
+  container.append(spot);
  }
 }
 
@@ -874,6 +1075,10 @@ function addIndexCell(tr,value,isSortMetric){
 }
 
 function renderCompanyTable(){
+ // Siempre se calculan y muestran los dos podios.
+ renderCompanyPodium('company-total-podium','indice');
+ renderCompanyPodium('company-daily-podium','indice_diario');
+
  const body = $('company-body');
  const list = orderedCompanies();
  body.replaceChildren();
@@ -888,7 +1093,6 @@ function renderCompanyTable(){
   cell(tr,decimal.format(group.pct_matriculas)+' %');
   cell(tr,integer.format(group.km));
   cell(tr,decimal.format(group.pct_km)+' %');
-
   addIndexCell(tr,group.indice,companySort==='indice');
   cell(tr,integer.format(group.viajes));
   cell(tr,integer.format(group.dias_camion));
@@ -919,7 +1123,7 @@ function renderCompanyTable(){
  const daily = companySort==='indice_diario';
 
  $('company-count').textContent =
-  integer.format(list.length)+' empresas · mayor a menor por '+
+  integer.format(list.length)+' empresas · tabla ordenada por '+
   (daily?'índice diario':'índice total');
 
  $('heading-index').textContent = 'Índice total'+(!daily?' ▼':'');
@@ -968,7 +1172,7 @@ function apply(){
 
  filtered = rows.filter(row =>
   filterKeys.every(key =>
-   selected[key] === null ||
+   selected[key]===null ||
    values(row,key).some(value => selected[key].has(value))
   )
  );
@@ -995,7 +1199,7 @@ function apply(){
 }
 
 function switchView(view){
- const plates = view === 'plates';
+ const plates = view==='plates';
  $('plates-section').hidden = !plates;
  $('companies-section').hidden = plates;
  $('view-plates').classList.toggle('active',plates);
@@ -1110,9 +1314,9 @@ function openDetail(source,title,scope,isCompany){
 
 function selectedPeriodRange(){
  if(
-  selected.anio?.size !== 1 ||
-  selected.mes_numero?.size !== 1 ||
-  selected.quincena?.size === 0
+  selected.anio?.size!==1 ||
+  selected.mes_numero?.size!==1 ||
+  selected.quincena?.size===0
  ) return '';
 
  const year = Number([...selected.anio][0]);
@@ -1143,10 +1347,7 @@ function appliedFiltersText(){
  }).join(' | ');
 
  const range = selectedPeriodRange();
-
- return description+
-  (range?' | '+range:'')+
-  ' | Cierre mensual: 26–25';
+ return description+(range?' | '+range:'')+' | Cierre mensual: 26–25';
 }
 
 function csvFile(name,headers,data,scope=''){
@@ -1329,7 +1530,6 @@ async function load(){
   }
 
   const parsed = validate(data);
-
   rows = parsed;
   loaded = true;
 
