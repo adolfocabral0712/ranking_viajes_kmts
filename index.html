@@ -11,7 +11,7 @@
 }
 *{box-sizing:border-box}
 body{margin:0;background:#F3F5F7;color:var(--text);font:14px "Segoe UI",Arial,sans-serif}
-main{max-width:1600px;margin:auto;padding:26px}
+main{max-width:1700px;margin:auto;padding:24px}
 header,.tools{display:flex;align-items:center;justify-content:space-between;gap:14px}
 h1{margin:0 0 7px;font-size:27px;color:var(--navy)}
 h2{margin:0;font-size:20px;color:var(--navy)}
@@ -100,9 +100,12 @@ tfoot{font-weight:700;background:#EAF0F5;color:var(--navy)}
  margin:0 16px 16px;padding:12px 14px;background:#F0F5F8;
  border-radius:7px;font-size:12px;line-height:1.6;
 }
+.company-actions{display:flex;gap:7px;flex-wrap:wrap}
+.sort-active{background:var(--teal)!important;color:white;border-color:var(--teal)}
+#company-table{min-width:1100px;font-size:11px}
 dialog{
  border:1px solid var(--border);border-radius:13px;
- width:min(1250px,96vw);max-height:92vh;padding:0;color:var(--text);
+ width:min(1350px,96vw);max-height:92vh;padding:0;color:var(--text);
 }
 dialog::backdrop{background:#18324770}
 .dialog-head{
@@ -114,6 +117,7 @@ dialog::backdrop{background:#18324770}
 .dialog-body h3{margin:22px 0 12px;color:var(--navy)}
 #detail-close{font-size:24px;padding:3px 10px}
 #detail-csv{margin-top:16px}
+.detail-scroll table{min-width:760px}
 .pill{display:block;font-size:10px;color:#946210;margin-top:2px}
 .podium{display:flex;align-items:flex-end;justify-content:center;gap:10px;padding:2px 22px 0;min-height:245px}
 .podium-spot{
@@ -165,7 +169,6 @@ dialog::backdrop{background:#18324770}
  .podium-place-1 .podium-block{height:100px}
  .podium-place-2 .podium-block{height:72px}
  .podium-place-3 .podium-block{height:52px}
- #company-table{min-width:800px}
 }
 </style>
 </head>
@@ -189,7 +192,7 @@ dialog::backdrop{background:#18324770}
  </button>
  <button class="view-card" id="view-companies" aria-pressed="false">
   <strong>Por empresa</strong>
-  <span>Participación en kilómetros respecto a su participación en la flota</span>
+  <span>Participación en kilómetros e intensidad por día con viajes</span>
  </button>
 </section>
 
@@ -259,25 +262,34 @@ dialog::backdrop{background:#18324770}
    <div>
     <h2>Ranking por empresa</h2>
     <p class="small" id="company-count"></p>
-    <p class="small">
-     Índice = % de kilómetros del total ÷ % de matrículas del total.
-     Orden de mayor a menor.
-    </p>
    </div>
-   <button id="company-csv" disabled>Exportar CSV</button>
+   <div class="company-actions">
+    <button id="sort-total" class="sort-active" aria-pressed="true">
+     Por índice total
+    </button>
+    <button id="sort-daily" aria-pressed="false">
+     Por índice diario
+    </button>
+    <button id="company-csv" disabled>Exportar CSV</button>
+   </div>
   </div>
 
-  <div class="reference" id="company-reference">
-   Referencia general: esperando datos…
-  </div>
+  <div class="reference" id="company-reference">Esperando datos…</div>
 
   <div class="scroll">
    <table id="company-table" class="ranking-table">
     <colgroup>
-     <col style="width:6%"><col style="width:28%">
-     <col style="width:11%"><col style="width:11%">
-     <col style="width:14%"><col style="width:10%">
-     <col style="width:10%"><col style="width:10%">
+     <col style="width:4%">
+     <col style="width:20%">
+     <col style="width:8%">
+     <col style="width:8%">
+     <col style="width:10%">
+     <col style="width:8%">
+     <col style="width:8%">
+     <col style="width:6%">
+     <col style="width:8%">
+     <col style="width:11%">
+     <col style="width:9%">
     </colgroup>
     <thead><tr>
      <th>Puesto</th>
@@ -286,27 +298,50 @@ dialog::backdrop{background:#18324770}
      <th>% de matrículas</th>
      <th>Kilómetros</th>
      <th>% de kilómetros</th>
-     <th>Índice ▼</th>
+     <th id="heading-index">Índice total ▼</th>
      <th>Viajes</th>
+     <th>Días-camión</th>
+     <th>Km por día-camión</th>
+     <th id="heading-daily">Índice diario</th>
     </tr></thead>
     <tbody id="company-body"></tbody>
     <tfoot id="company-footer"></tfoot>
    </table>
   </div>
 
-  <p class="note" style="padding:0 16px 12px">
-   Índice 1,00: participación proporcional.
-   Índice 1,50: 50 % por encima de lo proporcional.
-   Índice 0,80: 20 % por debajo.
-   Se consideran las matrículas con viajes dentro de los filtros aplicados.
-   Una matrícula cuenta una vez en cada empresa para la que trabajó;
-   el total general cuenta matrículas únicas.
-   Por eso, si hay camiones compartidos entre empresas,
-   los porcentajes de matrículas pueden sumar más de 100 %.
-   Los viajes con varios fleteros se muestran con los nombres juntos,
-   sin duplicar kilómetros.
-   Seleccioná el puesto para consultar los orígenes y viajes.
-  </p>
+  <div class="note" style="padding:0 16px 14px">
+   <p>
+    <strong>Índice total:</strong>
+    porcentaje de kilómetros ÷ porcentaje de matrículas del total filtrado.
+   </p>
+   <p>
+    <strong>Días-camión:</strong>
+    cantidad de combinaciones distintas de matrícula y fecha con viajes.
+    Un camión con varios viajes en el mismo día cuenta una sola vez.
+   </p>
+   <p>
+    <strong>Km por día-camión:</strong>
+    kilómetros de la empresa ÷ sus días-camión.
+   </p>
+   <p>
+    <strong>Índice diario:</strong>
+    km por día-camión de la empresa ÷ km por día-camión general.
+    Un índice de 1,50 significa 50 % por encima de la referencia.
+    Se utilizan los valores completos para ordenar; solo se redondea la presentación.
+   </p>
+   <p>
+    Los días sin viajes quedan fuera del indicador diario.
+    El dato no permite determinar si hubo descanso, avería o falta de carga.
+    Las diferencias de rutas también influyen en los kilómetros.
+   </p>
+   <p>
+    Si una matrícula trabajó para varias empresas, cuenta en cada una.
+    El total general cuenta matrículas y días-camión únicos;
+    por eso las sumas de esas columnas pueden superar el total general.
+    Los viajes con varios fleteros se muestran con sus nombres juntos,
+    sin duplicar kilómetros.
+   </p>
+  </div>
  </section>
 </section>
 
@@ -339,8 +374,22 @@ dialog::backdrop{background:#18324770}
     <tbody id="origin-body"></tbody>
    </table>
   </div>
+
+  <section id="detail-plates-section">
+   <h3>Resumen por matrícula</h3>
+   <div class="scroll">
+    <table>
+     <thead><tr>
+      <th>Matrícula</th><th>Viajes</th><th>Kilómetros</th>
+      <th>Días con viajes</th><th>Km por día con viajes</th>
+     </tr></thead>
+     <tbody id="detail-plates-body"></tbody>
+    </table>
+   </div>
+  </section>
+
   <h3>Viajes del período seleccionado</h3>
-  <div class="scroll">
+  <div class="scroll detail-scroll">
    <table>
     <thead><tr>
      <th>Fecha</th><th>Remitos</th><th>Matrícula</th>
@@ -397,6 +446,7 @@ let plateRanking = [];
 let companyRanking = [];
 let detailRows = [];
 let detailScope = '';
+let companySort = 'indice';
 let loaded = false;
 let busy = false;
 
@@ -485,6 +535,14 @@ function companyForRow(row){
  )].sort(compare);
 
  return names.join(' / ') || 'Sin empresa informada';
+}
+
+/*
+ Una combinación matrícula-fecha representa un día-camión.
+ Se usa la fecha real del viaje, no el mes operativo.
+*/
+function truckDayKey(row){
+ return JSON.stringify([row.matricula,row.fecha]);
 }
 
 function filterVisible(key){
@@ -602,17 +660,23 @@ function buildFilters(){
 }
 
 function totals(source){
+ const plates = new Set();
+ const truckDays = new Set();
  const total = {viajes:source.length,km:0,tons:0};
 
  for(const row of source){
   total.km += row.distancia_km;
   total.tons += row.toneladas;
+  plates.add(row.matricula);
+  truckDays.add(truckDayKey(row));
  }
 
+ total.matriculas = plates.size;
+ total.dias_camion = truckDays.size;
  total.km_viaje = total.viajes ? total.km/total.viajes : 0;
  total.tons_viaje = total.viajes ? total.tons/total.viajes : 0;
- total.matriculas = new Set(source.map(row => row.matricula)).size;
- total.km_camion = total.matriculas ? total.km/total.matriculas : 0;
+ total.km_dia_camion = total.dias_camion
+  ? total.km/total.dias_camion : 0;
 
  return total;
 }
@@ -626,7 +690,9 @@ function summarize(source,key){
   if(!map.has(id)){
    map.set(id,{
     id,viajes:0,km:0,tons:0,
-    plates:new Set(),fleets:new Set()
+    plates:new Set(),
+    fleets:new Set(),
+    truckDays:new Set()
    });
   }
 
@@ -635,28 +701,24 @@ function summarize(source,key){
   group.km += row.distancia_km;
   group.tons += row.toneladas;
   group.plates.add(row.matricula);
+  group.truckDays.add(truckDayKey(row));
   row.fleteros.forEach(name => group.fleets.add(name));
  }
 
  return [...map.values()].map(group => ({
-  ...group,
+  id:group.id,
+  viajes:group.viajes,
+  km:group.km,
+  tons:group.tons,
   matriculas:group.plates.size,
+  dias_camion:group.truckDays.size,
   fleteros:[...group.fleets].sort(compare).join(' / '),
   km_viaje:group.km/group.viajes,
-  tons_viaje:group.tons/group.viajes
+  tons_viaje:group.tons/group.viajes,
+  km_dia_camion:group.km/group.truckDays.size
  }));
 }
 
-/*
- ÍNDICE POR EMPRESA:
-
- participaciónKm = kmEmpresa / kmTotal
- participaciónFlota = matriculasEmpresa / matriculasUnicasTotal
- indice = participaciónKm / participaciónFlota
-
- Los cálculos usan valores completos.
- El redondeo se aplica solamente al mostrarlos.
-*/
 function calculateCompanies(){
  const total = totals(filtered);
 
@@ -669,10 +731,20 @@ function calculateCompanies(){
    ...group,
    pct_km:shareKm*100,
    pct_matriculas:shareFleet*100,
-   indice:shareFleet ? shareKm/shareFleet : 0
+
+   // Participación de km respecto a participación de matrículas.
+   indice:shareFleet ? shareKm/shareFleet : 0,
+
+   // Intensidad diaria respecto al promedio general.
+   indice_diario:total.km_dia_camion
+    ? group.km_dia_camion/total.km_dia_camion : 0
   };
- }).sort((a,b) =>
-  b.indice-a.indice ||
+ });
+}
+
+function orderedCompanies(){
+ return [...companyRanking].sort((a,b) =>
+  b[companySort]-a[companySort] ||
   b.km-a.km ||
   b.viajes-a.viajes ||
   compare(a.id,b.id)
@@ -703,7 +775,6 @@ function renderPodium(prefix,metric,list){
  for(const index of [1,0,2]){
   const position = index+1;
   const group = list[index];
-
   const button = document.createElement('button');
   button.className = 'podium-spot podium-place-'+position;
 
@@ -793,16 +864,28 @@ function renderPlateTable(prefix,metric){
 
 function indexDescription(index){
  const difference = (index-1)*100;
- if(Math.abs(difference)<0.005) return 'Participación proporcional';
+ if(Math.abs(difference)<0.005) return 'Igual a la referencia general';
  return decimal.format(Math.abs(difference))+' % '+
-  (difference>0?'por encima':'por debajo')+' de lo proporcional';
+  (difference>0?'por encima':'por debajo')+' de la referencia general';
+}
+
+function addIndexCell(tr,value,isSortMetric){
+ const node = cell(
+  tr,
+  decimal.format(value),
+  (isSortMetric?'metric ':'')+
+  (value>=1?'index-good':'index-low')
+ );
+ node.title = indexDescription(value);
+ return node;
 }
 
 function renderCompanyTable(){
  const body = $('company-body');
+ const list = orderedCompanies();
  body.replaceChildren();
 
- companyRanking.forEach((group,index) => {
+ list.forEach((group,index) => {
   const tr = document.createElement('tr');
   if(index<3) tr.className = 'top-three';
 
@@ -813,17 +896,16 @@ function renderCompanyTable(){
   cell(tr,integer.format(group.km));
   cell(tr,decimal.format(group.pct_km)+' %');
 
-  const indexCell = cell(
-   tr,decimal.format(group.indice),
-   'metric '+(group.indice>=1?'index-good':'index-low')
-  );
-  indexCell.title = indexDescription(group.indice);
-
+  addIndexCell(tr,group.indice,companySort==='indice');
   cell(tr,integer.format(group.viajes));
+  cell(tr,integer.format(group.dias_camion));
+  cell(tr,integer.format(group.km_dia_camion));
+  addIndexCell(tr,group.indice_diario,companySort==='indice_diario');
+
   body.append(tr);
  });
 
- if(!companyRanking.length) emptyRow(body,8);
+ if(!list.length) emptyRow(body,11);
 
  const total = totals(filtered);
  const hasData = filtered.length>0;
@@ -834,21 +916,42 @@ function renderCompanyTable(){
  cell(tr,hasData?'100,00 %':'—');
  cell(tr,integer.format(total.km));
  cell(tr,hasData?'100,00 %':'—');
- cell(tr,hasData?'1,00':'—','metric');
+ cell(tr,hasData?'1,00':'—',companySort==='indice'?'metric':'');
  cell(tr,integer.format(total.viajes));
+ cell(tr,integer.format(total.dias_camion));
+ cell(tr,integer.format(total.km_dia_camion));
+ cell(tr,hasData?'1,00':'—',companySort==='indice_diario'?'metric':'');
  $('company-footer').replaceChildren(tr);
 
+ const daily = companySort==='indice_diario';
+
  $('company-count').textContent =
-  integer.format(companyRanking.length)+' empresas · mayor a menor por índice';
+  integer.format(list.length)+' empresas · mayor a menor por '+
+  (daily?'índice diario':'índice total');
+
+ $('heading-index').textContent = 'Índice total'+(!daily?' ▼':'');
+ $('heading-daily').textContent = 'Índice diario'+(daily?' ▼':'');
+
+ $('heading-index').removeAttribute('aria-sort');
+ $('heading-daily').removeAttribute('aria-sort');
+ $(daily?'heading-daily':'heading-index')
+  .setAttribute('aria-sort','descending');
+
+ $('sort-total').classList.toggle('sort-active',!daily);
+ $('sort-daily').classList.toggle('sort-active',daily);
+ $('sort-total').setAttribute('aria-pressed',String(!daily));
+ $('sort-daily').setAttribute('aria-pressed',String(daily));
 
  $('company-reference').textContent = hasData
   ? 'Base general de los filtros: '+
     integer.format(total.km)+' km · '+
     integer.format(total.matriculas)+' matrículas únicas · '+
-    'Referencia: índice 1,00.'
+    integer.format(total.dias_camion)+' días-camión únicos · '+
+    integer.format(total.km_dia_camion)+' km por día-camión. '+
+    'Referencia para ambos índices: 1,00.'
   : 'Sin datos para calcular la referencia general.';
 
- $('company-csv').disabled = !companyRanking.length;
+ $('company-csv').disabled = !list.length;
 }
 
 function render(){
@@ -916,18 +1019,18 @@ function dateLabel(value){
 function openPlate(plate){
  openDetail(
   filtered.filter(row=>row.matricula===plate),
-  plate,'Matrícula consultada: '+plate
+  plate,'Matrícula consultada: '+plate,false
  );
 }
 
 function openCompany(company){
  openDetail(
   filtered.filter(row=>row.empresa===company),
-  company,'Empresa consultada: '+company
+  company,'Empresa consultada: '+company,true
  );
 }
 
-function openDetail(source,title,scope){
+function openDetail(source,title,scope,isCompany){
  detailRows = [...source].sort((a,b) =>
   compare(b.fecha,a.fecha) ||
   compare(a.matricula,b.matricula) ||
@@ -941,7 +1044,10 @@ function openDetail(source,title,scope){
  $('detail-subtitle').textContent =
   integer.format(total.matriculas)+' matrículas · '+
   integer.format(total.viajes)+' viajes · '+
-  integer.format(total.km)+' km · '+decimal.format(total.tons)+' t';
+  integer.format(total.km)+' km · '+
+  integer.format(total.dias_camion)+' días-camión · '+
+  integer.format(total.km_dia_camion)+' km por día-camión · '+
+  decimal.format(total.tons)+' t';
 
  const origins = $('origin-body');
  origins.replaceChildren();
@@ -959,6 +1065,28 @@ function openDetail(source,title,scope){
    origins.append(tr);
   });
 
+ $('detail-plates-section').hidden = !isCompany;
+ const platesBody = $('detail-plates-body');
+ platesBody.replaceChildren();
+
+ if(isCompany){
+  summarize(detailRows,'matricula')
+   .sort((a,b)=>
+    b.km_dia_camion-a.km_dia_camion ||
+    b.km-a.km ||
+    compare(a.id,b.id)
+   )
+   .forEach(group=>{
+    const tr = document.createElement('tr');
+    cell(tr,group.id);
+    cell(tr,integer.format(group.viajes));
+    cell(tr,integer.format(group.km));
+    cell(tr,integer.format(group.dias_camion));
+    cell(tr,integer.format(group.km_dia_camion));
+    platesBody.append(tr);
+   });
+ }
+
  const body = $('detail-body');
  body.replaceChildren();
 
@@ -973,6 +1101,7 @@ function openDetail(source,title,scope){
   cell(tr,decimal.format(row.toneladas));
 
   const km = cell(tr,integer.format(row.distancia_km));
+
   if(row.distancias_distintas){
    const flag = document.createElement('span');
    flag.className = 'pill';
@@ -1021,7 +1150,10 @@ function appliedFiltersText(){
  }).join(' | ');
 
  const range = selectedPeriodRange();
- return description+(range?' | '+range:'')+' | Cierre mensual: 26–25';
+
+ return description+
+  (range?' | '+range:'')+
+  ' | Cierre mensual: 26–25';
 }
 
 function csvFile(name,headers,data,scope=''){
@@ -1072,29 +1204,45 @@ function exportPlates(metric){
 function exportCompanies(){
  const total = totals(filtered);
 
- const data = companyRanking.map((group,index)=>[
-  index+1,group.id,group.matriculas,
+ const data = orderedCompanies().map((group,index)=>[
+  index+1,
+  group.id,
+  group.matriculas,
   csvDecimal(group.pct_matriculas)+' %',
   csvInteger(group.km),
   csvDecimal(group.pct_km)+' %',
   csvDecimal(group.indice),
-  group.viajes
+  group.viajes,
+  group.dias_camion,
+  csvInteger(group.km_dia_camion),
+  csvDecimal(group.indice_diario)
  ]);
 
  data.push([
-  '','TOTAL GENERAL',total.matriculas,
-  '100,00 %',csvInteger(total.km),'100,00 %','1,00',total.viajes
+  '',
+  'TOTAL GENERAL',
+  total.matriculas,
+  '100,00 %',
+  csvInteger(total.km),
+  '100,00 %',
+  '1,00',
+  total.viajes,
+  total.dias_camion,
+  csvInteger(total.km_dia_camion),
+  '1,00'
  ]);
 
  csvFile(
   'RankingPorEmpresa.csv',
   [
    'Puesto','Empresa','Cantidad de matrículas','% de matrículas',
-   'Kilómetros','% de kilómetros','Índice','Viajes'
+   'Kilómetros','% de kilómetros','Índice total','Viajes',
+   'Días-camión','Km por día-camión','Índice diario'
   ],
   data,
-  'Vista: Por empresa | Índice = % kilómetros / % matrículas'+
-  ' | Base: matrículas únicas y kilómetros de los filtros aplicados'
+  'Vista: Por empresa | Orden: '+
+  (companySort==='indice'?'Índice total':'Índice diario')+
+  ' descendente | Días-camión: matrícula y fecha únicas con viajes'
  );
 }
 
@@ -1125,7 +1273,8 @@ function validate(data){
   if(
    typeof row.fecha!=='string' ||
    row.fecha<'2025-01-01' ||
-   !row.matricula ||
+   typeof row.matricula!=='string' ||
+   !row.matricula.trim() ||
    normalize(row.origen)==='sin origen'
   ) throw Error('Viaje fuera de las reglas: '+row.viaje_id);
 
@@ -1138,11 +1287,14 @@ function validate(data){
    !Array.isArray(row.fleteros) ||
    !Array.isArray(row.remitos) ||
    !row.remitos.length ||
-   row.cantidad_remitos!==row.remitos.length
+   row.cantidad_remitos!==row.remitos.length ||
+   !Number.isInteger(row.registros_sin_toneladas) ||
+   row.registros_sin_toneladas<0
   ) throw Error('Datos inválidos en el viaje '+row.viaje_id);
 
   return {
    ...row,
+   matricula:row.matricula.trim().toUpperCase(),
    empresa:companyForRow(row),
    anio_calendario:row.anio,
    mes_calendario:row.mes_numero,
@@ -1153,6 +1305,7 @@ function validate(data){
 
 async function load(){
  if(busy) return;
+
  busy = true;
  $('refresh').disabled = true;
  status('Cargando viajes y distancias…');
@@ -1202,6 +1355,16 @@ buildFilters();
 
 $('view-plates').onclick = ()=>switchView('plates');
 $('view-companies').onclick = ()=>switchView('companies');
+
+$('sort-total').onclick = ()=>{
+ companySort = 'indice';
+ renderCompanyTable();
+};
+
+$('sort-daily').onclick = ()=>{
+ companySort = 'indice_diario';
+ renderCompanyTable();
+};
 
 $('clear').onclick = ()=>{
  for(const key of filterKeys){
