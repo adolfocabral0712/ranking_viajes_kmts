@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "ranking-viajes-distancia",
+  "name": "ranking-viajes-kmts",
   "main": "src/index.js",
   "compatibility_date": "2026-10-23",
   "workers_dev": true,
