@@ -2,765 +2,505 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Ranking de viajes y kilómetros</title>
-
 <style>
-:root {
-    --navy: #183247;
-    --teal: #176B67;
-    --blue: #386A96;
-    --border: #DCE3E9;
-    --muted: #687887;
-    --text: #263746;
-}
-
-* { box-sizing: border-box; }
-
-body {
-    margin: 0;
-    background: #F3F5F7;
-    color: var(--text);
-    font: 14px "Segoe UI", Arial, sans-serif;
-}
-
-main {
-    max-width: 1600px;
-    margin: auto;
-    padding: 26px;
-}
-
-header, .tools {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-}
-
-h1 {
-    margin: 0 0 7px;
-    font-size: 27px;
-    letter-spacing: -.5px;
-    color: var(--navy);
-}
-
-h2 {
-    font-size: 20px;
-    color: var(--navy);
-    margin: 0;
-}
-
-p {
-    color: var(--muted);
-    line-height: 1.5;
-    margin: 6px 0;
-}
-
-button, input {
-    font: inherit;
-    padding: 10px 13px;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    background: white;
-    color: var(--navy);
-}
-
-button {
-    cursor: pointer;
-    transition: background .15s;
-}
-
-button:hover { background: #EDF2F6; }
-
-button.primary {
-    background: var(--navy);
-    border-color: var(--navy);
-    color: white;
-}
-
-button.primary:hover { background: #274960; }
-
-button:disabled {
-    opacity: .45;
-    cursor: default;
-}
-
-button:focus-visible,
-a:focus-visible,
-summary:focus-visible,
-input:focus-visible {
-    outline: 2px solid var(--blue);
-    outline-offset: 3px;
-}
-
-.filters {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 12px;
-    margin: 24px 0 18px;
-}
-
-.multi {
-    position: relative;
-    min-width: 0;
-    background: white;
-    border-radius: 9px;
-}
-
-.multi summary {
-    font-weight: 600;
-    padding: 14px;
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    font-size: 12px;
-    line-height: 1.5;
-    cursor: pointer;
-    overflow-wrap: anywhere;
-    color: var(--navy);
-    min-height: 52px;
-}
-
-.multi[open] { z-index: 12; }
-
-.popup {
-    position: absolute;
-    top: calc(100% + 7px);
-    left: 0;
-    width: 280px;
-    max-width: calc(100vw - 40px);
-    background: white;
-    padding: 12px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    box-shadow: 0 12px 30px #18324720;
-}
-
-.search {
-    width: 100%;
-    margin-bottom: 9px;
-    background: #F7F9FB;
-}
-
-.filter-actions {
-    display: flex;
-    gap: 7px;
-}
-
-.filter-actions button {
-    flex: 1;
-    font-size: 11px;
-    padding: 8px;
-}
-
-.choices {
-    max-height: 260px;
-    overflow: auto;
-    margin-top: 8px;
-}
-
-.choice {
-    display: flex;
-    gap: 9px;
-    padding: 9px 4px;
-    align-items: center;
-    cursor: pointer;
-    font-size: 12px;
-}
-
-.choice:hover { background: #F0F5F8; }
-
-.choice input {
-    accent-color: var(--blue);
-    width: 17px;
-    height: 17px;
-    padding: 0;
-    margin: 0;
-}
-
-.choice[hidden] { display: none; }
-
-.cards {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 14px;
-    margin-bottom: 18px;
-}
-
-.card {
-    background: white;
-    border: 1px solid var(--border);
-    border-top: 4px solid var(--navy);
-    border-radius: 10px;
-    text-align: center;
-    padding: 20px 12px;
-    box-shadow: 0 2px 6px #18324704;
-}
-
-.card:nth-child(2),
-.card:nth-child(3) {
-    border-top-color: var(--teal);
-}
-
-.card:nth-child(4) { border-top-color: var(--blue); }
-
-.card span {
-    font-size: 12px;
-    color: var(--muted);
-}
-
-.card strong {
-    display: block;
-    font-size: 27px;
-    font-weight: 700;
-    color: var(--navy);
-    margin-top: 9px;
-    font-variant-numeric: tabular-nums;
-}
-
-.rankings-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
-    align-items: start;
-}
-
-.panel {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 11px;
-    overflow: hidden;
-    box-shadow: 0 3px 12px #18324704;
-}
-
-.tools {
-    padding: 19px 16px;
-    flex-wrap: wrap;
-}
-
-.tools h2::before {
-    content: "";
-    display: inline-block;
-    width: 13px;
-    height: 13px;
-    border-radius: 3px;
-    background: var(--teal);
-    margin-right: 9px;
-}
-
-.trips-panel .tools h2::before { background: var(--blue); }
-
-.tools button {
-    font-size: 12px;
-    padding: 8px 10px;
-}
-
-.tools .small {
-    font-size: 11px;
-    margin-left: 23px;
-}
-
-.scroll { overflow-x: auto; }
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-    line-height: 1.1;
-}
-
-th, td {
-    text-align: center;
-    padding: 6px 4px;
-    line-height: 1.1;
-    height: auto;
-    border-bottom: 1px solid #E8EDF1;
-}
-
-th {
-    background: var(--navy);
-    color: white;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    font-weight: 600;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    line-height: 1.15;
-}
-
-.km-panel th { background: var(--teal); }
-.trips-panel th { background: var(--blue); }
-
-tbody tr:nth-child(even) { background: #FAFBFC; }
-tbody tr:hover { background: #F0F5F8; }
-
-td.long { overflow-wrap: anywhere; }
-
-tfoot {
-    font-weight: 700;
-    background: #EAF0F5;
-    color: var(--navy);
-}
-
-.ranking-table { table-layout: fixed; }
-
-.ranking-table th,
-.ranking-table td {
-    white-space: normal;
-    overflow-wrap: anywhere;
-}
-
-.metric {
-    font-weight: 700;
-    color: var(--teal);
-    background: #EDF7F4;
-}
-
-.trips-panel .metric {
-    color: var(--blue);
-    background: #EDF4FA;
-}
-
-.top-three { background: #F1F9F6 !important; }
-.trips-panel .top-three { background: #F0F6FC !important; }
-
-.rank-link {
-    display: inline-block;
-    color: var(--teal);
-    font-weight: 700;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    padding: 0 3px;
-    line-height: 1.1;
-    min-height: 0;
-    border-radius: 5px;
-}
-
-.trips-panel .rank-link { color: var(--blue); }
-.rank-link:hover { background: #E0EFEA; }
-.trips-panel .rank-link:hover { background: #E0EBF6; }
-
-#status {
-    margin: 12px 0 18px;
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.5;
-}
-
-#status.error { color: #A52E2E; }
-
-.note {
-    font-size: 12px;
-    margin-top: 16px;
-}
-
-.pill {
-    font-size: 10px;
-    padding: 1px 3px;
-    border-radius: 4px;
-    background: #FFF4DB;
-    color: #B7791F;
-    display: inline-block;
-    margin-top: 1px;
-    line-height: 1.05;
-}
-
-.small { font-size: 11px; }
-
-dialog {
-    border: 1px solid var(--border);
-    border-radius: 13px;
-    width: min(1250px, 96vw);
-    max-height: 92vh;
-    padding: 0;
-    color: var(--text);
-    box-shadow: 0 20px 70px #18324730;
-}
-
-dialog::backdrop { background: #18324770; }
-
-.dialog-head {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    align-items: center;
-    padding: 20px;
-    position: sticky;
-    top: 0;
-    background: white;
-    z-index: 5;
-    border-bottom: 1px solid var(--border);
-}
-
-.dialog-body { padding: 0 20px 20px; }
-
-.dialog-body h3 {
-    margin: 22px 0 12px;
-    color: var(--navy);
-}
-
-.dialog-body table { table-layout: fixed; }
-
-.dialog-body th,
-.dialog-body td { overflow-wrap: anywhere; }
-
-#detail-close {
-    font-size: 24px;
-    padding: 3px 10px;
-}
-
-#detail-csv { margin-top: 16px; }
-
-/* Podios */
-
-.podium {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    gap: 10px;
-    padding: 2px 22px 0;
-    min-height: 245px;
-}
-
-.podium-spot {
-    flex: 1;
-    min-width: 0;
-    max-width: 210px;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-end;
-    padding: 0;
-    border: 0;
-    border-radius: 7px 7px 0 0;
-    background: transparent;
-    color: var(--navy);
-    text-align: center;
-}
-
-.podium-spot:hover { background: #F3F7FA; }
-.podium-spot:focus-visible { outline-offset: 3px; }
-
-.podium-medal {
-    display: block;
-    height: 34px;
-    font-size: 24px;
-    line-height: 32px;
-}
-
-.podium-place-1 .podium-medal { font-size: 30px; }
-
-.podium-meta {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0 3px 10px;
-    min-height: 93px;
-}
-
-.podium-plate {
-    font-size: 18px;
-    line-height: 1.2;
-    text-decoration: underline;
-    text-decoration-color: #18324740;
-    text-underline-offset: 3px;
-}
-
-.podium-company {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    font-size: 11px;
-    line-height: 1.3;
-    min-height: 29px;
-    color: var(--muted);
-    margin: 4px 0;
-}
-
-.podium-value {
-    font-size: 17px;
-    font-weight: 750;
-    line-height: 1.2;
-    color: var(--teal);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-}
-
-.trips-panel .podium-value { color: var(--blue); }
-
-.podium-block {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid;
-    border-bottom: 0;
-    border-radius: 6px 6px 0 0;
-    box-shadow: inset 0 5px 0 #FFFFFF55;
-}
-
-.podium-block span {
-    font-size: 42px;
-    font-weight: 750;
-    line-height: 1;
-}
-
-.podium-place-1 .podium-block {
-    height: 118px;
-    background: #EFE2B4;
-    border-color: #C1A15A;
-    color: #896514;
-}
-
-.podium-place-2 .podium-block {
-    height: 83px;
-    background: #E2E8EE;
-    border-color: #A2B0BE;
-    color: #52677A;
-}
-
-.podium-place-3 .podium-block {
-    height: 61px;
-    background: #E8D3C4;
-    border-color: #BD9780;
-    color: #8C5C40;
-}
-
-.podium-missing { opacity: .32; }
-
-.podium-hint {
-    font-size: 10px;
-    text-align: center;
-    margin: 0;
-    padding: 8px 12px 12px;
-    border-top: 2px solid #DCE3E9;
-    color: var(--muted);
-}
-
-.podium-message {
-    width: 100%;
-    align-self: center;
-    text-align: center;
-    font-size: 12px;
-    padding: 25px;
-}
-
-.podium-spot:disabled { cursor: default; }
-.podium-spot:disabled:hover { background: transparent; }
-
-@media (max-width: 1000px) {
-    .rankings-grid { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 950px) {
-    .filters, .cards {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 650px) {
-    main { padding: 12px; }
-
-    header {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    h1 { font-size: 23px; }
-
-    .filters, .cards {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .card { padding: 16px 8px; }
-    .card strong { font-size: 23px; }
-
-    .multi:nth-child(even) .popup {
-        left: auto;
-        right: 0;
-    }
-
-    table { font-size: 11px; }
-    th, td { padding: 6px 3px; }
-    .rank-link { padding: 0 2px; }
-    .tools { padding: 16px 12px; }
-
-    .podium {
-        gap: 6px;
-        padding: 0 12px;
-        min-height: 225px;
-    }
-
-    .podium-plate { font-size: 16px; }
-    .podium-value { font-size: 15px; }
-    .podium-company { font-size: 10px; }
-    .podium-meta { min-height: 88px; }
-    .podium-block span { font-size: 36px; }
-    .podium-place-1 .podium-block { height: 100px; }
-    .podium-place-2 .podium-block { height: 72px; }
-    .podium-place-3 .podium-block { height: 52px; }
+:root{
+    --navy:#183247;
+    --teal:#176B67;
+    --blue:#386A96;
+    --border:#DCE3E9;
+    --muted:#687887;
+    --text:#263746;
+}
+*{box-sizing:border-box}
+body{
+    margin:0;
+    background:#F3F5F7;
+    color:var(--text);
+    font:14px "Segoe UI",Arial,sans-serif;
+}
+main{max-width:1600px;margin:auto;padding:26px}
+header,.tools{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+}
+h1{margin:0 0 7px;font-size:27px;color:var(--navy)}
+h2{margin:0;font-size:20px;color:var(--navy)}
+p{color:var(--muted);line-height:1.5;margin:6px 0}
+button,input{
+    font:inherit;
+    padding:10px 13px;
+    border:1px solid var(--border);
+    border-radius:7px;
+    background:white;
+    color:var(--navy);
+}
+button{cursor:pointer}
+button:hover{background:#EDF2F6}
+button.primary{background:var(--navy);color:white}
+button:disabled{opacity:.45;cursor:default}
+button:focus-visible,a:focus-visible,
+summary:focus-visible,input:focus-visible{
+    outline:2px solid var(--blue);
+    outline-offset:3px;
+}
+[hidden]{display:none!important}
+.view-cards{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;
+    margin:22px 0 0;
+}
+.view-card{
+    text-align:left;
+    padding:17px 20px;
+    border:2px solid var(--border);
+    border-radius:11px;
+}
+.view-card strong{display:block;font-size:18px}
+.view-card span{
+    display:block;
+    margin-top:5px;
+    font-size:12px;
+    color:var(--muted);
+}
+.view-card.active{
+    border-color:var(--teal);
+    background:#EAF5F2;
+}
+.view-card.active strong{color:var(--teal)}
+.filters{
+    display:grid;
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    gap:12px;
+    margin:20px 0 18px;
+}
+.multi{position:relative;min-width:0;background:white;border-radius:9px}
+.multi summary{
+    font-weight:600;
+    padding:14px;
+    border:1px solid var(--border);
+    border-radius:9px;
+    font-size:12px;
+    line-height:1.5;
+    cursor:pointer;
+    overflow-wrap:anywhere;
+    min-height:52px;
+}
+.multi[open]{z-index:12}
+.popup{
+    position:absolute;
+    top:calc(100% + 7px);
+    left:0;
+    width:280px;
+    max-width:calc(100vw - 40px);
+    background:white;
+    padding:12px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    box-shadow:0 12px 30px #18324720;
+}
+.search{width:100%;margin-bottom:9px;background:#F7F9FB}
+.filter-actions{display:flex;gap:7px}
+.filter-actions button{flex:1;font-size:11px;padding:8px}
+.choices{max-height:260px;overflow:auto;margin-top:8px}
+.choice{
+    display:flex;
+    gap:9px;
+    padding:9px 4px;
+    align-items:center;
+    cursor:pointer;
+    font-size:12px;
+}
+.choice:hover{background:#F0F5F8}
+.choice input{
+    accent-color:var(--blue);
+    width:17px;
+    height:17px;
+    padding:0;
+    margin:0;
+}
+.cards{
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:14px;
+    margin-bottom:18px;
+}
+.card{
+    background:white;
+    border:1px solid var(--border);
+    border-top:4px solid var(--navy);
+    border-radius:10px;
+    text-align:center;
+    padding:20px 12px;
+}
+.card:nth-child(2),.card:nth-child(3){border-top-color:var(--teal)}
+.card:nth-child(4){border-top-color:var(--blue)}
+.card span{font-size:12px;color:var(--muted)}
+.card strong{
+    display:block;
+    font-size:27px;
+    color:var(--navy);
+    margin-top:9px;
+    font-variant-numeric:tabular-nums;
+}
+.rankings-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:20px;
+    align-items:start;
+}
+.panel{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:11px;
+    overflow:hidden;
+}
+.tools{padding:19px 16px;flex-wrap:wrap}
+.tools button{font-size:12px;padding:8px 10px}
+.small{font-size:11px}
+.scroll{overflow-x:auto}
+table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12px;
+    line-height:1.1;
+}
+th,td{
+    text-align:center;
+    padding:6px 4px;
+    border-bottom:1px solid #E8EDF1;
+    overflow-wrap:anywhere;
+}
+th{
+    background:var(--teal);
+    color:white;
+    padding-top:4px;
+    padding-bottom:4px;
+    line-height:1.15;
+}
+.trips-panel th{background:var(--blue)}
+tbody tr:nth-child(even){background:#FAFBFC}
+tbody tr:hover{background:#F0F5F8}
+tfoot{font-weight:700;background:#EAF0F5;color:var(--navy)}
+.ranking-table{table-layout:fixed}
+.metric{font-weight:700;color:var(--teal);background:#EDF7F4}
+.trips-panel .metric{color:var(--blue);background:#EDF4FA}
+.top-three{background:#F1F9F6!important}
+.trips-panel .top-three{background:#F0F6FC!important}
+.rank-link{
+    display:inline-block;
+    color:var(--teal);
+    font-weight:700;
+    text-decoration:underline;
+    text-underline-offset:3px;
+    padding:0 3px;
+}
+.trips-panel .rank-link{color:var(--blue)}
+.company-name{text-align:left}
+#status{margin:12px 0 18px;font-size:12px;line-height:1.5;color:var(--muted)}
+#status.error{color:#A52E2E}
+.note{font-size:12px;margin-top:16px}
+dialog{
+    border:1px solid var(--border);
+    border-radius:13px;
+    width:min(1250px,96vw);
+    max-height:92vh;
+    padding:0;
+    color:var(--text);
+}
+dialog::backdrop{background:#18324770}
+.dialog-head{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    align-items:center;
+    padding:20px;
+    position:sticky;
+    top:0;
+    background:white;
+    z-index:5;
+    border-bottom:1px solid var(--border);
+}
+.dialog-body{padding:0 20px 20px}
+.dialog-body h3{margin:22px 0 12px;color:var(--navy)}
+#detail-close{font-size:24px;padding:3px 10px}
+#detail-csv{margin-top:16px}
+.pill{
+    display:block;
+    font-size:10px;
+    color:#946210;
+    margin-top:2px;
+}
+.podium{
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    gap:10px;
+    padding:2px 22px 0;
+    min-height:245px;
+}
+.podium-spot{
+    flex:1;
+    min-width:0;
+    max-width:210px;
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    padding:0;
+    border:0;
+    background:transparent;
+    text-align:center;
+}
+.podium-medal{height:34px;font-size:24px;line-height:32px}
+.podium-place-1 .podium-medal{font-size:30px}
+.podium-meta{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:0 3px 10px;
+    min-height:93px;
+}
+.podium-plate{font-size:18px;text-decoration:underline}
+.podium-company{
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+    font-size:11px;
+    line-height:1.3;
+    min-height:29px;
+    color:var(--muted);
+    margin:4px 0;
+}
+.podium-value{font-size:17px;font-weight:750;color:var(--teal);white-space:nowrap}
+.trips-panel .podium-value{color:var(--blue)}
+.podium-block{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid;
+    border-bottom:0;
+    border-radius:6px 6px 0 0;
+}
+.podium-block span{font-size:42px;font-weight:750}
+.podium-place-1 .podium-block{
+    height:118px;background:#EFE2B4;border-color:#C1A15A;color:#896514;
+}
+.podium-place-2 .podium-block{
+    height:83px;background:#E2E8EE;border-color:#A2B0BE;color:#52677A;
+}
+.podium-place-3 .podium-block{
+    height:61px;background:#E8D3C4;border-color:#BD9780;color:#8C5C40;
+}
+.podium-missing{opacity:.32}
+.podium-hint{
+    font-size:10px;text-align:center;margin:0;padding:8px 12px 12px;
+    border-top:2px solid var(--border);
+}
+.podium-message{padding:25px;font-size:12px}
+@media(max-width:1000px){
+    .rankings-grid{grid-template-columns:1fr}
+}
+@media(max-width:950px){
+    .filters,.cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:650px){
+    main{padding:12px}
+    header{align-items:flex-start;flex-direction:column}
+    h1{font-size:23px}
+    .filters,.cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .card{padding:16px 8px}
+    .card strong{font-size:23px}
+    .view-card{padding:13px}
+    .view-card strong{font-size:16px}
+    .multi:nth-child(even) .popup{left:auto;right:0}
+    table{font-size:11px}
+    th,td{padding:6px 3px}
+    .tools{padding:16px 12px}
+    .podium{gap:6px;padding:0 12px;min-height:225px}
+    .podium-plate{font-size:16px}
+    .podium-value{font-size:15px}
+    .podium-company{font-size:10px}
+    .podium-meta{min-height:88px}
+    .podium-place-1 .podium-block{height:100px}
+    .podium-place-2 .podium-block{height:72px}
+    .podium-place-3 .podium-block{height:52px}
+    #company-table{min-width:700px}
 }
 </style>
 </head>
-
 <body>
 <main>
-    <header>
-        <div>
-            <h1>Ranking de viajes y kilómetros</h1>
-            <p id="updated">
-                Desde enero de 2025 · kilómetros de ida registrados
-            </p>
-        </div>
-
-        <div>
-            <button id="clear">Limpiar filtros</button>
-            <button class="primary" id="refresh">Actualizar</button>
-        </div>
-    </header>
-
-    <section
-        class="filters"
-        id="filters"
-        aria-label="Filtros"
-    ></section>
-
-    <section class="cards">
-        <div class="card">
-            <span>Matrículas utilizadas</span>
-            <strong id="k-plates">—</strong>
-        </div>
-
-        <div class="card">
-            <span>Viajes</span>
-            <strong id="k-trips">—</strong>
-        </div>
-
-        <div class="card">
-            <span>Kilómetros registrados</span>
-            <strong id="k-km">—</strong>
-        </div>
-
-        <div class="card">
-            <span>Toneladas transportadas</span>
-            <strong id="k-tons">—</strong>
-        </div>
-
-        <div class="card">
-            <span>Kilómetros / viaje</span>
-            <strong id="k-average">—</strong>
-        </div>
-    </section>
-
-    <div id="status" role="status" aria-live="polite">
-        Cargando viajes y distancias…
+<header>
+    <div>
+        <h1>Ranking de viajes y kilómetros</h1>
+        <p id="updated">Desde 01/01/2025 · kilómetros de ida registrados</p>
     </div>
+    <div>
+        <button id="clear">Limpiar filtros</button>
+        <button id="refresh" class="primary">Actualizar</button>
+    </div>
+</header>
 
-    <section class="rankings-grid">
-        <section class="panel km-panel">
-            <div class="tools">
-                <div>
-                    <h2>Por kilómetros</h2>
-                    <p class="small" id="km-count">
-                        Ranking por matrícula
-                    </p>
-                </div>
+<section class="view-cards" aria-label="Vista del ranking">
+    <button class="view-card active" id="view-plates" aria-pressed="true">
+        <strong>Por matrícula</strong>
+        <span>Rankings por kilómetros y cantidad de viajes</span>
+    </button>
+    <button class="view-card" id="view-companies" aria-pressed="false">
+        <strong>Por empresa</strong>
+        <span>Ranking por kilómetros por camión utilizado</span>
+    </button>
+</section>
 
-                <button id="km-csv" disabled>Exportar CSV</button>
+<section class="filters" id="filters" aria-label="Filtros"></section>
+
+<section class="cards">
+    <div class="card">
+        <span>Matrículas utilizadas</span><strong id="k-plates">—</strong>
+    </div>
+    <div class="card">
+        <span>Viajes</span><strong id="k-trips">—</strong>
+    </div>
+    <div class="card">
+        <span>Kilómetros registrados</span><strong id="k-km">—</strong>
+    </div>
+    <div class="card">
+        <span>Toneladas transportadas</span><strong id="k-tons">—</strong>
+    </div>
+    <div class="card">
+        <span>Kilómetros / viaje</span><strong id="k-average">—</strong>
+    </div>
+</section>
+
+<div id="status" role="status" aria-live="polite">Cargando datos…</div>
+
+<section id="plates-section" class="rankings-grid">
+    <section class="panel km-panel">
+        <div class="tools">
+            <div>
+                <h2>Por kilómetros</h2>
+                <p class="small" id="km-count"></p>
             </div>
-
-            <div
-                class="podium"
-                id="km-podium"
-                aria-label="Podio por kilómetros"
-            ></div>
-
-            <p class="podium-hint">
-                Seleccioná una matrícula o puesto para consultar sus viajes
-            </p>
-
-            <div class="scroll">
-                <table class="ranking-table">
-                    <colgroup>
-                        <col style="width:7%">
-                        <col style="width:14%">
-                        <col style="width:29%">
-                        <col style="width:13%">
-                        <col style="width:21%">
-                        <col style="width:16%">
-                    </colgroup>
-
-                    <thead>
-                        <tr id="km-headers"></tr>
-                    </thead>
-
-                    <tbody id="km-body"></tbody>
-                    <tfoot id="km-footer"></tfoot>
-                </table>
-            </div>
-        </section>
-
-        <section class="panel trips-panel">
-            <div class="tools">
-                <div>
-                    <h2>Por viajes</h2>
-                    <p class="small" id="trips-count">
-                        Ranking por matrícula
-                    </p>
-                </div>
-
-                <button id="trips-csv" disabled>Exportar CSV</button>
-            </div>
-
-            <div
-                class="podium"
-                id="trips-podium"
-                aria-label="Podio por viajes"
-            ></div>
-
-            <p class="podium-hint">
-                Seleccioná una matrícula o puesto para consultar sus viajes
-            </p>
-
-            <div class="scroll">
-                <table class="ranking-table">
-                    <colgroup>
-                        <col style="width:7%">
-                        <col style="width:14%">
-                        <col style="width:29%">
-                        <col style="width:13%">
-                        <col style="width:21%">
-                        <col style="width:16%">
-                    </colgroup>
-
-                    <thead>
-                        <tr id="trips-headers"></tr>
-                    </thead>
-
-                    <tbody id="trips-body"></tbody>
-                    <tfoot id="trips-footer"></tfoot>
-                </table>
-            </div>
-        </section>
+            <button id="km-csv" disabled>Exportar CSV</button>
+        </div>
+        <div class="podium" id="km-podium"></div>
+        <p class="podium-hint">
+            Seleccioná una matrícula o puesto para consultar sus viajes
+        </p>
+        <div class="scroll">
+            <table class="ranking-table">
+                <colgroup>
+                    <col style="width:7%"><col style="width:14%">
+                    <col style="width:29%"><col style="width:13%">
+                    <col style="width:21%"><col style="width:16%">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>Puesto</th><th>Matrícula</th><th>Fletero</th>
+                        <th>Viajes</th><th>Kilómetros ▼</th><th>Km / viaje</th>
+                    </tr>
+                </thead>
+                <tbody id="km-body"></tbody>
+                <tfoot id="km-footer"></tfoot>
+            </table>
+        </div>
     </section>
 
-    <p class="note">
-        Mes operativo: del 26 del mes anterior al 25 del mes seleccionado.
-        Quincena 1: del 26 del mes anterior al 10 del mes seleccionado.
-        Quincena 2: del 11 al 25 del mes seleccionado.
-        El año operativo va del 26/12 del año anterior al 25/12 del seleccionado.
-        Enero de 2025 está limitado por la fuente:
-        no contiene diciembre de 2024.
-        Solo entradas desde 01/01/2025 con distancia positiva,
-        matrícula válida y origen informado.
-        Viaje estimado: misma matrícula, día, origen y depósito,
-        con hasta 3 números entre el menor y el mayor remito del grupo.
-        Se suman las toneladas y se toma la mayor distancia una sola vez.
-        El agrupamiento se realiza antes de filtrar.
-        Los kilómetros son distancias de ruta registradas, no mediciones GPS.
-        Un filtro de fletero incluye el viaje completo si contiene
-        alguna de las opciones seleccionadas.
-    </p>
+    <section class="panel trips-panel">
+        <div class="tools">
+            <div>
+                <h2>Por viajes</h2>
+                <p class="small" id="trips-count"></p>
+            </div>
+            <button id="trips-csv" disabled>Exportar CSV</button>
+        </div>
+        <div class="podium" id="trips-podium"></div>
+        <p class="podium-hint">
+            Seleccioná una matrícula o puesto para consultar sus viajes
+        </p>
+        <div class="scroll">
+            <table class="ranking-table">
+                <colgroup>
+                    <col style="width:7%"><col style="width:14%">
+                    <col style="width:29%"><col style="width:13%">
+                    <col style="width:21%"><col style="width:16%">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>Puesto</th><th>Matrícula</th><th>Fletero</th>
+                        <th>Viajes ▼</th><th>Kilómetros</th><th>Km / viaje</th>
+                    </tr>
+                </thead>
+                <tbody id="trips-body"></tbody>
+                <tfoot id="trips-footer"></tfoot>
+            </table>
+        </div>
+    </section>
+</section>
+
+<section id="companies-section" hidden>
+    <section class="panel">
+        <div class="tools">
+            <div>
+                <h2>Por empresa</h2>
+                <p class="small" id="company-count"></p>
+                <p class="small">
+                    Km por camión = kilómetros totales ÷ matrículas distintas
+                    utilizadas en el período filtrado.
+                </p>
+            </div>
+            <button id="company-csv" disabled>Exportar CSV</button>
+        </div>
+        <div class="scroll">
+            <table id="company-table" class="ranking-table">
+                <colgroup>
+                    <col style="width:6%"><col style="width:30%">
+                    <col style="width:12%"><col style="width:16%">
+                    <col style="width:12%"><col style="width:12%">
+                    <col style="width:12%">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>Puesto</th>
+                        <th>Empresa</th>
+                        <th>Cantidad de matrículas</th>
+                        <th>Km por camión ▼</th>
+                        <th>Kilómetros</th>
+                        <th>Viajes</th>
+                        <th>Km / viaje</th>
+                    </tr>
+                </thead>
+                <tbody id="company-body"></tbody>
+                <tfoot id="company-footer"></tfoot>
+            </table>
+        </div>
+        <p class="note" style="padding:0 16px 12px">
+            El puesto abre el detalle de la empresa.
+            Cada matrícula se cuenta una sola vez por empresa.
+            Si trabajó para varias empresas, cuenta en cada una;
+            el total general muestra matrículas únicas.
+            Los viajes con varios fleteros se muestran como una empresa
+            combinada para conservar los totales.
+        </p>
+    </section>
+</section>
+
+<p class="note">
+    Mes operativo: del 26 del mes anterior al 25 del seleccionado.
+    Quincena 1: del 26 al 10. Quincena 2: del 11 al 25.
+    Año operativo: del 26/12 del anterior al 25/12 del seleccionado.
+    La fuente comienza el 01/01/2025.
+    Viaje estimado: misma matrícula, día, origen y depósito,
+    con hasta 3 números entre el menor y el mayor remito del grupo.
+    Se suman toneladas y se toma la mayor distancia una sola vez.
+    El agrupamiento de viajes proviene del JSON.
+    Los kilómetros son distancias de ruta registradas, no mediciones GPS.
+</p>
 </main>
 
 <dialog id="details">
@@ -769,56 +509,34 @@ dialog::backdrop { background: #18324770; }
             <h2 id="detail-title"></h2>
             <p id="detail-subtitle"></p>
         </div>
-
         <button id="detail-close" aria-label="Cerrar">×</button>
     </div>
-
     <div class="dialog-body">
         <h3>Resumen por origen</h3>
-
         <div class="scroll">
             <table>
                 <thead>
                     <tr>
-                        <th>Origen</th>
-                        <th>Viajes</th>
-                        <th>Kilómetros</th>
-                        <th>Toneladas</th>
-                        <th>Km / viaje</th>
-                        <th>t / viaje</th>
+                        <th>Origen</th><th>Viajes</th><th>Kilómetros</th>
+                        <th>Toneladas</th><th>Km / viaje</th><th>t / viaje</th>
                     </tr>
                 </thead>
-
                 <tbody id="origin-body"></tbody>
             </table>
         </div>
-
         <h3>Viajes del período seleccionado</h3>
-
-        <p class="small">
-            Cuando hay varios remitos, la distancia mostrada
-            es la máxima del grupo.
-        </p>
-
         <div class="scroll">
             <table>
                 <thead>
                     <tr>
-                        <th>Fecha</th>
-                        <th>Remitos</th>
-                        <th>Matrícula</th>
-                        <th>Fletero</th>
-                        <th>Origen</th>
-                        <th>Depósito</th>
-                        <th>Toneladas</th>
-                        <th>Km</th>
+                        <th>Fecha</th><th>Remitos</th><th>Matrícula</th>
+                        <th>Fletero</th><th>Origen</th><th>Depósito</th>
+                        <th>Toneladas</th><th>Km</th>
                     </tr>
                 </thead>
-
                 <tbody id="detail-body"></tbody>
             </table>
         </div>
-
         <button id="detail-csv">Exportar viajes CSV</button>
     </div>
 </dialog>
@@ -827,217 +545,213 @@ dialog::backdrop { background: #18324770; }
 'use strict';
 
 const URL_JSON =
-    'https://dl.dropbox.com/scl/fi/c6r2wfa9wkl5ciwz30si8/' +
-    'RankingViajesDistancia.json?' +
-    'rlkey=m5t2qg20chg818ydyi8axcir3&dl=1';
+'https://dl.dropbox.com/scl/fi/c6r2wfa9wkl5ciwz30si8/RankingViajesDistancia.json?rlkey=m5t2qg20chg818ydyi8axcir3&dl=1';
 
 const $ = id => document.getElementById(id);
 
 const months = [
-    'ENERO', 'FEBRERO', 'MARZO', 'ABRIL',
-    'MAYO', 'JUNIO', 'JULIO', 'AGOSTO',
-    'SETIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'
+    'ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO',
+    'JULIO','AGOSTO','SETIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'
 ];
 
-const filters = [
-    'anio',
-    'mes_numero',
-    'quincena',
-    'deposito',
-    'matricula',
-    'fleteros'
+const filterKeys = [
+    'anio','mes_numero','quincena','deposito','matricula','fleteros'
 ];
 
 const labels = {
-    anio: 'Año',
-    mes_numero: 'Mes del período',
-    quincena: 'Quincena',
-    deposito: 'Depósito',
-    matricula: 'Matrícula',
-    fleteros: 'Fletero'
+    anio:'Año',
+    mes_numero:'Mes del período',
+    quincena:'Quincena',
+    deposito:'Depósito',
+    matricula:'Matrícula',
+    fleteros:'Fletero'
 };
 
-const selected = Object.fromEntries(
-    filters.map(key => [key, null])
-);
+const selected = Object.fromEntries(filterKeys.map(k => [k,null]));
+const search = Object.fromEntries(filterKeys.map(k => [k,'']));
 
-const search = Object.fromEntries(
-    filters.map(key => [key, ''])
-);
-
-const cols = [
-    'matricula',
-    'fleteros',
-    'viajes',
-    'km',
-    'km_viaje'
-];
-
-const headings = [
-    'Matrícula',
-    'Fletero',
-    'Viajes',
-    'Kilómetros',
-    'Km / viaje'
-];
-
-const fmt = new Intl.NumberFormat('es-UY', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+const integer = new Intl.NumberFormat('es-UY',{
+    minimumFractionDigits:0,maximumFractionDigits:0
 });
 
-const integer = new Intl.NumberFormat('es-UY', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
+const decimal = new Intl.NumberFormat('es-UY',{
+    minimumFractionDigits:2,maximumFractionDigits:2
 });
 
 let rows = [];
 let filtered = [];
-let ranking = [];
+let plateRanking = [];
+let companyRanking = [];
 let detailRows = [];
+let detailScope = '';
+let activeView = 'plates';
 let loaded = false;
 let busy = false;
 
-function normalizeText(value) {
-    return String(value ?? '')
-        .trim()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLocaleLowerCase('es');
+function normalize(value){
+    return String(value ?? '').trim().normalize('NFD')
+        .replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('es');
 }
 
-function compare(a, b) {
-    return String(a).localeCompare(String(b), 'es', {
-        numeric: true,
-        sensitivity: 'base'
+function compare(a,b){
+    return String(a).localeCompare(String(b),'es',{
+        numeric:true,sensitivity:'base'
     });
 }
 
-function values(row, key) {
+function valueLabel(key,value){
+    if(key === 'mes_numero') return months[Number(value)-1] || value;
+    if(key === 'quincena'){
+        return value === '1'
+            ? 'Quincena 1 (26–10)'
+            : 'Quincena 2 (11–25)';
+    }
+    return value || '(Sin dato)';
+}
+
+function values(row,key){
     return Array.isArray(row[key])
         ? row[key].map(String)
         : [String(row[key] ?? '')];
 }
 
-function valueLabel(key, value) {
-    if (key === 'quincena') {
-        return value === '1'
-            ? 'Quincena 1 (26–10)'
-            : 'Quincena 2 (11–25)';
-    }
-
-    if (key === 'mes_numero') {
-        return months[Number(value) - 1] || value;
-    }
-
-    return value || '(Sin dato)';
+function status(text,error=false){
+    $('status').textContent = text;
+    $('status').classList.toggle('error',error);
 }
 
-function matches(row) {
-    return filters.every(key =>
-        selected[key] === null ||
-        values(row, key).some(value => selected[key].has(value))
+function cell(tr,text,className=''){
+    const td = document.createElement('td');
+    td.textContent = text;
+    td.className = className;
+    tr.append(td);
+    return td;
+}
+
+function addPosition(tr,position,callback){
+    const td = cell(tr,'');
+    const link = document.createElement('a');
+    link.href = '#detalle';
+    link.className = 'rank-link';
+    link.textContent = integer.format(position);
+    link.setAttribute('aria-label','Ver detalle del puesto '+position);
+    link.onclick = event => {
+        event.preventDefault();
+        callback();
+    };
+    td.append(link);
+}
+
+function periodForDate(value){
+    const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(!match) throw Error('Fecha inválida: '+value);
+
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+    const date = new Date(Date.UTC(year,month-1,day));
+
+    if(
+        date.getUTCFullYear() !== year ||
+        date.getUTCMonth() !== month-1 ||
+        date.getUTCDate() !== day
+    ) throw Error('Fecha inválida: '+value);
+
+    const period = new Date(
+        Date.UTC(year,month-1+(day>=26?1:0),1)
     );
+
+    return {
+        anio:period.getUTCFullYear(),
+        mes_numero:period.getUTCMonth()+1,
+        mes_nombre:months[period.getUTCMonth()],
+        quincena:day>=26 || day<=10 ? '1':'2'
+    };
 }
 
-function status(message, error = false) {
-    $('status').textContent = message;
-    $('status').classList.toggle('error', error);
+function companyForRow(row){
+    const names = [...new Set(
+        row.fleteros.map(name => String(name).trim()).filter(Boolean)
+    )].sort(compare);
+
+    return names.join(' / ') || 'Sin empresa informada';
 }
 
-function filterVisible(key) {
-    const query = normalizeText(search[key]);
-
-    document.querySelectorAll(
-        '#choices-' + key + ' .choice'
-    ).forEach(label => {
-        label.hidden = !normalizeText(label.textContent).includes(query);
-    });
+function filterVisible(key){
+    const query = normalize(search[key]);
+    document.querySelectorAll('#choices-'+key+' .choice')
+        .forEach(label => {
+            label.hidden = !normalize(label.textContent).includes(query);
+        });
 }
 
-function options() {
-    for (const key of filters) {
-        const all = [
-            ...new Set(rows.flatMap(row => values(row, key)))
-        ].sort(compare);
+function renderFilterOptions(){
+    for(const key of filterKeys){
+        const all = [...new Set(
+            rows.flatMap(row => values(row,key))
+        )].sort(compare);
 
-        const box = $('choices-' + key);
-        box.replaceChildren();
+        const container = $('choices-'+key);
+        container.replaceChildren();
 
-        for (const value of all) {
+        for(const value of all){
             const label = document.createElement('label');
             label.className = 'choice';
 
             const input = document.createElement('input');
             input.type = 'checkbox';
             input.checked =
-                selected[key] === null ||
-                selected[key].has(value);
+                selected[key] === null || selected[key].has(value);
 
             input.onchange = () => {
-                if (selected[key] === null) {
+                if(selected[key] === null){
                     selected[key] = new Set(all);
                 }
+                if(input.checked) selected[key].add(value);
+                else selected[key].delete(value);
 
-                if (input.checked) {
-                    selected[key].add(value);
-                } else {
-                    selected[key].delete(value);
-                }
-
-                if (selected[key].size === all.length) {
+                if(selected[key].size === all.length){
                     selected[key] = null;
                 }
-
                 apply();
             };
 
             const span = document.createElement('span');
-            span.textContent = valueLabel(key, value);
-
-            label.append(input, span);
-            box.append(label);
+            span.textContent = valueLabel(key,value);
+            label.append(input,span);
+            container.append(label);
         }
 
-        let description;
+        const description = selected[key] === null
+            ? 'Todos'
+            : selected[key].size === 0
+                ? 'Ninguno'
+                : [...selected[key]].sort(compare)
+                    .map(value => valueLabel(key,value)).join(', ');
 
-        if (selected[key] === null) {
-            description = 'Todos';
-        } else if (selected[key].size === 0) {
-            description = 'Ninguno';
-        } else {
-            description = [...selected[key]]
-                .sort(compare)
-                .map(value => valueLabel(key, value))
-                .join(', ');
-        }
-
-        $('summary-' + key).textContent =
-            labels[key] + ': ' + description;
-
+        $('summary-'+key).textContent = labels[key]+': '+description;
         filterVisible(key);
     }
 }
 
-function buildFilters() {
-    for (const key of filters) {
+function buildFilters(){
+    for(const key of filterKeys){
         const details = document.createElement('details');
         details.className = 'multi';
 
-        const title = document.createElement('summary');
-        title.id = 'summary-' + key;
-        title.textContent = labels[key] + ': Todos';
+        const summary = document.createElement('summary');
+        summary.id = 'summary-'+key;
+        summary.textContent = labels[key]+': Todos';
 
         const popup = document.createElement('div');
         popup.className = 'popup';
 
         const input = document.createElement('input');
         input.type = 'search';
-        input.id = 'search-' + key;
         input.className = 'search';
+        input.id = 'search-'+key;
         input.placeholder = 'Buscar coincidencias…';
-        input.setAttribute('aria-label', 'Buscar ' + labels[key]);
-
+        input.setAttribute('aria-label','Buscar '+labels[key]);
         input.oninput = () => {
             search[key] = input.value;
             filterVisible(key);
@@ -1046,840 +760,651 @@ function buildFilters() {
         const actions = document.createElement('div');
         actions.className = 'filter-actions';
 
-        const all = document.createElement('button');
-        all.textContent = 'Marcar todas';
-
-        all.onclick = () => {
-            selected[key] = null;
-            apply();
-        };
-
-        const none = document.createElement('button');
-        none.textContent = 'Quitar todas';
-
-        none.onclick = () => {
-            selected[key] = new Set();
-            apply();
-        };
-
-        actions.append(all, none);
+        for(const [text,selection] of [
+            ['Marcar todas',true],['Quitar todas',false]
+        ]){
+            const button = document.createElement('button');
+            button.textContent = text;
+            button.onclick = () => {
+                selected[key] = selection ? null : new Set();
+                apply();
+            };
+            actions.append(button);
+        }
 
         const choices = document.createElement('div');
+        choices.id = 'choices-'+key;
         choices.className = 'choices';
-        choices.id = 'choices-' + key;
 
-        popup.append(input, actions, choices);
-        details.append(title, popup);
+        popup.append(input,actions,choices);
+        details.append(summary,popup);
         $('filters').append(details);
     }
 
-    document.addEventListener('click', event => {
+    document.addEventListener('click',event => {
         document.querySelectorAll('.multi[open]').forEach(details => {
-            if (!details.contains(event.target)) {
-                details.open = false;
-            }
+            if(!details.contains(event.target)) details.open = false;
         });
     });
 
-    document.addEventListener('keydown', event => {
-        if (event.key === 'Escape') {
-            document.querySelectorAll('.multi[open]').forEach(details => {
-                details.open = false;
-            });
+    document.addEventListener('keydown',event => {
+        if(event.key === 'Escape'){
+            document.querySelectorAll('.multi[open]')
+                .forEach(details => details.open = false);
         }
     });
 }
 
-/*
-Mes y año operativos:
-
-26/12/2025 a 25/01/2026 -> ENERO 2026
-26/01/2026 a 25/02/2026 -> FEBRERO 2026
-
-Quincena 1: 26 del mes anterior al 10.
-Quincena 2: 11 al 25.
-*/
-function periodForDate(value) {
-    const match = String(value).match(
-        /^(\d{4})-(\d{2})-(\d{2})$/
-    );
-
-    if (!match) {
-        throw Error('Fecha inválida: ' + value);
+function totals(source){
+    const total = {viajes:source.length,km:0,tons:0};
+    for(const row of source){
+        total.km += row.distancia_km;
+        total.tons += row.toneladas;
     }
-
-    const year = Number(match[1]);
-    const month = Number(match[2]);
-    const day = Number(match[3]);
-
-    const date = new Date(Date.UTC(year, month - 1, day));
-
-    if (
-        date.getUTCFullYear() !== year ||
-        date.getUTCMonth() !== month - 1 ||
-        date.getUTCDate() !== day
-    ) {
-        throw Error('Fecha inválida: ' + value);
-    }
-
-    const period = new Date(
-        Date.UTC(year, month - 1 + (day >= 26 ? 1 : 0), 1)
-    );
-
-    return {
-        anio: period.getUTCFullYear(),
-        mes_numero: period.getUTCMonth() + 1,
-        mes_nombre: months[period.getUTCMonth()],
-        quincena: day >= 26 || day <= 10 ? '1' : '2'
-    };
+    total.km_viaje = total.viajes ? total.km/total.viajes : 0;
+    total.tons_viaje = total.viajes ? total.tons/total.viajes : 0;
+    total.matriculas = new Set(source.map(row => row.matricula)).size;
+    total.km_camion = total.matriculas ? total.km/total.matriculas : 0;
+    return total;
 }
 
-function selectedPeriodRange() {
-    if (
-        selected.anio?.size !== 1 ||
-        selected.mes_numero?.size !== 1 ||
-        selected.quincena?.size === 0
-    ) {
-        return '';
-    }
-
-    const year = Number([...selected.anio][0]);
-    const month = Number([...selected.mes_numero][0]);
-
-    const quincena = selected.quincena?.size === 1
-        ? [...selected.quincena][0]
-        : null;
-
-    const from = quincena === '2'
-        ? new Date(Date.UTC(year, month - 1, 11))
-        : new Date(Date.UTC(year, month - 2, 26));
-
-    const to = new Date(
-        Date.UTC(year, month - 1, quincena === '1' ? 10 : 25)
-    );
-
-    const label = date =>
-        String(date.getUTCDate()).padStart(2, '0') + '/' +
-        String(date.getUTCMonth() + 1).padStart(2, '0') + '/' +
-        date.getUTCFullYear();
-
-    return 'Período: ' + label(from) + ' al ' + label(to);
-}
-
-function summarize(source, key) {
+function summarize(source,key){
     const map = new Map();
 
-    for (const row of source) {
+    for(const row of source){
         const id = row[key];
 
-        if (!map.has(id)) {
-            map.set(id, {
-                [key]: id,
-                viajes: 0,
-                km: 0,
-                tons: 0,
-                fleterosSet: new Set()
+        if(!map.has(id)){
+            map.set(id,{
+                id,
+                viajes:0,
+                km:0,
+                tons:0,
+                plates:new Set(),
+                fleets:new Set()
             });
         }
 
         const group = map.get(id);
-
         group.viajes++;
         group.km += row.distancia_km;
         group.tons += row.toneladas;
-
-        for (const name of row.fleteros) {
-            group.fleterosSet.add(name);
-        }
+        group.plates.add(row.matricula);
+        row.fleteros.forEach(name => group.fleets.add(name));
     }
 
     return [...map.values()].map(group => ({
         ...group,
-        fleteros: [...group.fleterosSet].sort(compare).join(' / '),
-        km_viaje: group.km / group.viajes,
-        tons_viaje: group.tons / group.viajes
+        matriculas:group.plates.size,
+        fleteros:[...group.fleets].sort(compare).join(' / '),
+        km_camion:group.km/group.plates.size,
+        km_viaje:group.km/group.viajes,
+        tons_viaje:group.tons/group.viajes
     }));
 }
 
-function totals(source) {
-    const total = {
-        viajes: source.length,
-        km: 0,
-        tons: 0
-    };
-
-    for (const row of source) {
-        total.km += row.distancia_km;
-        total.tons += row.toneladas;
-    }
-
-    total.km_viaje = total.viajes
-        ? total.km / total.viajes
-        : 0;
-
-    total.tons_viaje = total.viajes
-        ? total.tons / total.viajes
-        : 0;
-
-    return total;
-}
-
-function display(key, value) {
-    if (['viajes', 'puesto', 'km', 'km_viaje'].includes(key)) {
-        return integer.format(value);
-    }
-
-    if (['tons', 'tons_viaje'].includes(key)) {
-        return fmt.format(value);
-    }
-
-    return String(value || '—');
-}
-
-function td(tr, value, className) {
-    const node = document.createElement('td');
-    node.textContent = value;
-
-    if (className) {
-        node.className = className;
-    }
-
-    tr.append(node);
-    return node;
-}
-
-function orderedRanking(metric) {
-    return [...ranking].sort((a, b) =>
+function orderedPlates(metric){
+    return [...plateRanking].sort((a,b) =>
         metric === 'km'
-            ? (
-                b.km - a.km ||
-                b.viajes - a.viajes ||
-                compare(a.matricula, b.matricula)
-            )
-            : (
-                b.viajes - a.viajes ||
-                b.km - a.km ||
-                compare(a.matricula, b.matricula)
-            )
+            ? b.km-a.km || b.viajes-a.viajes || compare(a.id,b.id)
+            : b.viajes-a.viajes || b.km-a.km || compare(a.id,b.id)
     );
 }
 
-function renderPodium(prefix, metric, list) {
-    const container = $(prefix + '-podium');
+function renderPodium(prefix,metric,list){
+    const container = $(prefix+'-podium');
     container.replaceChildren();
 
-    if (!list.length) {
+    if(!list.length){
         const message = document.createElement('p');
         message.className = 'podium-message';
-
         message.textContent = loaded
             ? 'Sin viajes para estos filtros.'
             : 'Esperando datos…';
-
         container.append(message);
         return;
     }
 
-    for (const index of [1, 0, 2]) {
-        const rank = index + 1;
+    for(const index of [1,0,2]){
+        const position = index+1;
         const group = list[index];
 
-        const spot = document.createElement('button');
-        spot.type = 'button';
-        spot.className = 'podium-spot podium-place-' + rank;
+        const button = document.createElement('button');
+        button.className = 'podium-spot podium-place-'+position;
 
-        if (!group) {
-            spot.disabled = true;
-            spot.classList.add('podium-missing');
-            spot.setAttribute(
-                'aria-label',
-                'Sin datos para el puesto ' + rank
+        if(group){
+            button.onclick = () => openPlate(group.id);
+            button.setAttribute(
+                'aria-label','Puesto '+position+': '+group.id
             );
-        } else {
-            spot.setAttribute(
-                'aria-label',
-                'Puesto ' + rank + ': ' + group.matricula +
-                '. Ver orígenes y viajes.'
-            );
-
-            spot.onclick = () => openDetail(group.matricula);
+        }else{
+            button.disabled = true;
+            button.classList.add('podium-missing');
         }
 
         const medal = document.createElement('span');
         medal.className = 'podium-medal';
-        medal.setAttribute('aria-hidden', 'true');
-
-        medal.textContent = rank === 1
-            ? '🏆'
-            : rank === 2 ? '🥈' : '🥉';
+        medal.textContent = ['🏆','🥈','🥉'][index];
 
         const meta = document.createElement('span');
         meta.className = 'podium-meta';
 
         const plate = document.createElement('strong');
         plate.className = 'podium-plate';
-        plate.textContent = group ? group.matricula : '—';
+        plate.textContent = group ? group.id : '—';
 
-        const fleet = document.createElement('span');
-        fleet.className = 'podium-company';
-        fleet.textContent = group
-            ? group.fleteros || 'Sin fletero'
-            : 'Sin datos';
-
-        if (group) {
-            fleet.title = group.fleteros;
-        }
+        const company = document.createElement('span');
+        company.className = 'podium-company';
+        company.textContent = group ? group.fleteros : 'Sin datos';
+        company.title = group ? group.fleteros : '';
 
         const value = document.createElement('span');
         value.className = 'podium-value';
-
         value.textContent = group
-            ? integer.format(group[metric]) +
-                (metric === 'km' ? ' km' : ' viajes')
+            ? integer.format(group[metric])+
+                (metric === 'km' ? ' km':' viajes')
             : '—';
 
-        meta.append(plate, fleet, value);
+        meta.append(plate,company,value);
 
         const block = document.createElement('span');
         block.className = 'podium-block';
-
         const number = document.createElement('span');
-        number.textContent = rank;
-
+        number.textContent = position;
         block.append(number);
-        spot.append(medal, meta, block);
-        container.append(spot);
+
+        button.append(medal,meta,block);
+        container.append(button);
     }
 }
 
-function renderRanking(prefix, metric) {
-    const list = orderedRanking(metric);
-    const body = $(prefix + '-body');
-
-    renderPodium(prefix, metric, list);
+function renderPlateTable(prefix,metric){
+    const list = orderedPlates(metric);
+    const body = $(prefix+'-body');
     body.replaceChildren();
+    renderPodium(prefix,metric,list);
 
-    list.forEach((group, index) => {
+    list.forEach((group,index) => {
         const tr = document.createElement('tr');
+        if(index<3) tr.className = 'top-three';
 
-        if (index < 3) {
-            tr.classList.add('top-three');
-        }
-
-        const position = td(tr, '');
-
-        const link = document.createElement('a');
-        link.href = '#detalle-' + encodeURIComponent(group.matricula);
-        link.className = 'rank-link';
-        link.textContent = integer.format(index + 1);
-
-        link.setAttribute(
-            'aria-label',
-            'Ver orígenes y viajes de ' + group.matricula
-        );
-
-        link.onclick = event => {
-            event.preventDefault();
-            openDetail(group.matricula);
-        };
-
-        position.append(link);
-
-        for (const key of cols) {
-            td(
-                tr,
-                display(key, group[key]),
-                key === metric
-                    ? 'metric'
-                    : key === 'fleteros' ? 'long' : ''
-            );
-        }
-
+        addPosition(tr,index+1,() => openPlate(group.id));
+        cell(tr,group.id);
+        cell(tr,group.fleteros || '—');
+        cell(tr,integer.format(group.viajes),metric==='viajes'?'metric':'');
+        cell(tr,integer.format(group.km),metric==='km'?'metric':'');
+        cell(tr,integer.format(group.km_viaje));
         body.append(tr);
     });
 
-    if (!list.length) {
-        const tr = document.createElement('tr');
-
-        const cell = td(
-            tr,
-            loaded
-                ? 'No hay viajes para estos filtros.'
-                : 'Esperando datos…'
-        );
-
-        cell.colSpan = 6;
-        body.append(tr);
-    }
+    if(!list.length) emptyRow(body,6);
 
     const total = totals(filtered);
     const tr = document.createElement('tr');
-    const title = td(tr, 'TOTAL FILTRADO');
-    title.colSpan = 3;
+    cell(tr,'TOTAL FILTRADO').colSpan = 3;
+    cell(tr,integer.format(total.viajes));
+    cell(tr,integer.format(total.km));
+    cell(tr,integer.format(total.km_viaje));
+    $(prefix+'-footer').replaceChildren(tr);
 
-    for (const key of ['viajes', 'km', 'km_viaje']) {
-        td(tr, display(key, total[key]));
-    }
-
-    $(prefix + '-footer').replaceChildren(tr);
-
-    $(prefix + '-count').textContent =
-        integer.format(list.length) + ' camiones · mayor a menor';
-
-    $(prefix + '-csv').disabled = !list.length;
+    $(prefix+'-count').textContent =
+        integer.format(list.length)+' camiones · mayor a menor';
+    $(prefix+'-csv').disabled = !list.length;
 }
 
-function render() {
+function emptyRow(body,columns){
+    const tr = document.createElement('tr');
+    cell(tr,loaded?'No hay datos para estos filtros.':'Esperando datos…')
+        .colSpan = columns;
+    body.append(tr);
+}
+
+function renderCompanyTable(){
+    const body = $('company-body');
+    body.replaceChildren();
+
+    companyRanking.forEach((group,index) => {
+        const tr = document.createElement('tr');
+        if(index<3) tr.className = 'top-three';
+
+        addPosition(tr,index+1,() => openCompany(group.id));
+        cell(tr,group.id,'company-name');
+        cell(tr,integer.format(group.matriculas));
+        cell(tr,integer.format(group.km_camion),'metric');
+        cell(tr,integer.format(group.km));
+        cell(tr,integer.format(group.viajes));
+        cell(tr,integer.format(group.km_viaje));
+        body.append(tr);
+    });
+
+    if(!companyRanking.length) emptyRow(body,7);
+
+    const total = totals(filtered);
+    const tr = document.createElement('tr');
+
+    cell(tr,'TOTAL GENERAL').colSpan = 2;
+    cell(tr,integer.format(total.matriculas));
+    cell(tr,integer.format(total.km_camion),'metric');
+    cell(tr,integer.format(total.km));
+    cell(tr,integer.format(total.viajes));
+    cell(tr,integer.format(total.km_viaje));
+    $('company-footer').replaceChildren(tr);
+
+    $('company-count').textContent =
+        integer.format(companyRanking.length)+
+        ' empresas · mayor a menor por km por camión';
+
+    $('company-csv').disabled = !companyRanking.length;
+}
+
+function render(){
     const total = totals(filtered);
 
     $('k-plates').textContent = loaded
-        ? integer.format(ranking.length)
-        : '—';
-
+        ? integer.format(total.matriculas):'—';
     $('k-trips').textContent = loaded
-        ? integer.format(total.viajes)
-        : '—';
-
+        ? integer.format(total.viajes):'—';
     $('k-km').textContent = loaded
-        ? integer.format(total.km)
-        : '—';
-
+        ? integer.format(total.km):'—';
     $('k-tons').textContent = loaded
-        ? fmt.format(total.tons)
-        : '—';
-
+        ? decimal.format(total.tons):'—';
     $('k-average').textContent = loaded
-        ? integer.format(total.km_viaje)
-        : '—';
+        ? integer.format(total.km_viaje):'—';
 
-    renderRanking('km', 'km');
-    renderRanking('trips', 'viajes');
+    renderPlateTable('km','km');
+    renderPlateTable('trips','viajes');
+    renderCompanyTable();
 }
 
-function apply() {
-    options();
+function apply(){
+    if($('details').open) $('details').close();
 
-    filtered = rows.filter(matches);
-    ranking = summarize(filtered, 'matricula');
+    renderFilterOptions();
+
+    filtered = rows.filter(row =>
+        filterKeys.every(key =>
+            selected[key] === null ||
+            values(row,key).some(value => selected[key].has(value))
+        )
+    );
+
+    plateRanking = summarize(filtered,'matricula');
+
+    companyRanking = summarize(filtered,'empresa').sort((a,b) =>
+        b.km_camion-a.km_camion ||
+        b.km-a.km ||
+        b.viajes-a.viajes ||
+        compare(a.id,b.id)
+    );
 
     render();
 
-    if (loaded) {
+    if(loaded){
         const remitos = filtered.reduce(
-            (total, row) => total + row.cantidad_remitos,
-            0
+            (sum,row) => sum+row.cantidad_remitos,0
         );
-
-        const mixed = filtered.filter(
-            row => row.distancias_distintas
-        ).length;
-
+        const mixed = filtered.filter(row => row.distancias_distintas).length;
         const missing = filtered.reduce(
-            (total, row) => total + row.registros_sin_toneladas,
-            0
+            (sum,row) => sum+row.registros_sin_toneladas,0
         );
 
         status(
-            integer.format(filtered.length) + ' viajes · ' +
-            integer.format(remitos) + ' remitos · ' +
-            mixed + ' viajes con distancias distintas ' +
-            '(se tomó la mayor)' +
-            (
-                missing
-                    ? ' · ' + missing +
-                      ' remitos sin toneladas: total de toneladas incompleto.'
-                    : '.'
-            )
+            integer.format(filtered.length)+' viajes · '+
+            integer.format(remitos)+' remitos · '+
+            integer.format(mixed)+
+            ' viajes con distancias distintas (se tomó la mayor).'+
+            (missing
+                ? ' '+integer.format(missing)+' remitos sin toneladas.'
+                : '')
         );
     }
 }
 
-function dateLabel(value) {
-    const parts = value.split('-');
-    return parts[2] + '/' + parts[1] + '/' + parts[0];
+function switchView(view){
+    activeView = view;
+    const plates = view === 'plates';
+
+    $('plates-section').hidden = !plates;
+    $('companies-section').hidden = plates;
+
+    $('view-plates').classList.toggle('active',plates);
+    $('view-companies').classList.toggle('active',!plates);
+    $('view-plates').setAttribute('aria-pressed',String(plates));
+    $('view-companies').setAttribute('aria-pressed',String(!plates));
 }
 
-function renderDetail() {
-    const box = $('detail-body');
-    box.replaceChildren();
+function dateLabel(value){
+    const parts = value.split('-');
+    return parts[2]+'/'+parts[1]+'/'+parts[0];
+}
 
-    for (const row of detailRows) {
+function openPlate(plate){
+    openDetail(
+        filtered.filter(row => row.matricula === plate),
+        plate,
+        'Matrícula consultada: '+plate
+    );
+}
+
+function openCompany(company){
+    openDetail(
+        filtered.filter(row => row.empresa === company),
+        company,
+        'Empresa consultada: '+company
+    );
+}
+
+function openDetail(source,title,scope){
+    detailRows = [...source].sort((a,b) =>
+        compare(b.fecha,a.fecha) ||
+        compare(a.matricula,b.matricula) ||
+        compare(a.remitos[0],b.remitos[0])
+    );
+
+    detailScope = scope;
+    const total = totals(detailRows);
+
+    $('detail-title').textContent = title+' · Orígenes y viajes';
+    $('detail-subtitle').textContent =
+        integer.format(total.matriculas)+' matrículas · '+
+        integer.format(total.viajes)+' viajes · '+
+        integer.format(total.km)+' km · '+
+        decimal.format(total.tons)+' t';
+
+    const origins = $('origin-body');
+    origins.replaceChildren();
+
+    summarize(detailRows,'origen')
+        .sort((a,b) => b.km-a.km || compare(a.id,b.id))
+        .forEach(group => {
+            const tr = document.createElement('tr');
+            cell(tr,group.id);
+            cell(tr,integer.format(group.viajes));
+            cell(tr,integer.format(group.km));
+            cell(tr,decimal.format(group.tons));
+            cell(tr,integer.format(group.km_viaje));
+            cell(tr,decimal.format(group.tons_viaje));
+            origins.append(tr);
+        });
+
+    const body = $('detail-body');
+    body.replaceChildren();
+
+    for(const row of detailRows){
         const tr = document.createElement('tr');
+        cell(tr,dateLabel(row.fecha));
+        cell(tr,row.remitos.join(', '));
+        cell(tr,row.matricula);
+        cell(tr,row.fleteros.join(' / '));
+        cell(tr,row.origen);
+        cell(tr,row.deposito);
+        cell(tr,decimal.format(row.toneladas));
+        const km = cell(tr,integer.format(row.distancia_km));
 
-        td(tr, dateLabel(row.fecha));
-        td(tr, row.remitos.join(', '), 'long');
-        td(tr, row.matricula);
-        td(tr, row.fleteros.join(' / '), 'long');
-        td(tr, row.origen, 'long');
-        td(tr, row.deposito, 'long');
-        td(tr, fmt.format(row.toneladas));
-
-        const cell = td(tr, integer.format(row.distancia_km));
-
-        if (row.distancias_distintas) {
+        if(row.distancias_distintas){
             const flag = document.createElement('span');
             flag.className = 'pill';
             flag.textContent = 'Máxima del grupo';
-
-            cell.append(document.createElement('br'), flag);
+            km.append(flag);
         }
-
-        box.append(tr);
-    }
-}
-
-function openDetail(plate) {
-    detailRows = filtered
-        .filter(row => row.matricula === plate)
-        .sort((a, b) =>
-            compare(b.fecha, a.fecha) ||
-            compare(a.remitos[0], b.remitos[0])
-        );
-
-    const total = totals(detailRows);
-
-    $('detail-title').textContent =
-        plate + ' · Orígenes y viajes';
-
-    $('detail-subtitle').textContent =
-        integer.format(total.viajes) + ' viajes · ' +
-        integer.format(total.km) + ' km · ' +
-        fmt.format(total.tons) + ' t';
-
-    $('origin-body').replaceChildren();
-
-    const origins = summarize(detailRows, 'origen')
-        .sort((a, b) => b.km - a.km);
-
-    for (const group of origins) {
-        const tr = document.createElement('tr');
-
-        td(tr, group.origen, 'long');
-
-        for (const key of [
-            'viajes', 'km', 'tons', 'km_viaje', 'tons_viaje'
-        ]) {
-            td(tr, display(key, group[key]));
-        }
-
-        $('origin-body').append(tr);
+        body.append(tr);
     }
 
-    renderDetail();
     $('details').showModal();
 }
 
-function appliedFiltersText() {
-    const text = filters.map(key => {
-        let description;
+function selectedPeriodRange(){
+    if(
+        selected.anio?.size !== 1 ||
+        selected.mes_numero?.size !== 1 ||
+        selected.quincena?.size === 0
+    ) return '';
 
-        if (selected[key] === null) {
-            description = 'Todos';
-        } else if (selected[key].size === 0) {
-            description = 'Ninguno';
-        } else {
-            description = [...selected[key]]
-                .sort(compare)
-                .map(value => valueLabel(key, value))
-                .join(', ');
-        }
+    const year = Number([...selected.anio][0]);
+    const month = Number([...selected.mes_numero][0]);
+    const q = selected.quincena?.size === 1
+        ? [...selected.quincena][0]:null;
 
-        return labels[key] + ': ' + description;
+    const from = q === '2'
+        ? new Date(Date.UTC(year,month-1,11))
+        : new Date(Date.UTC(year,month-2,26));
+    const to = new Date(Date.UTC(year,month-1,q==='1'?10:25));
+
+    const label = d =>
+        String(d.getUTCDate()).padStart(2,'0')+'/'+
+        String(d.getUTCMonth()+1).padStart(2,'0')+'/'+
+        d.getUTCFullYear();
+
+    return 'Período: '+label(from)+' al '+label(to);
+}
+
+function appliedFiltersText(){
+    const description = filterKeys.map(key => {
+        const text = selected[key] === null
+            ? 'Todos'
+            : selected[key].size === 0
+                ? 'Ninguno'
+                : [...selected[key]].sort(compare)
+                    .map(value => valueLabel(key,value)).join(', ');
+        return labels[key]+': '+text;
     }).join(' | ');
 
     const range = selectedPeriodRange();
 
-    return text +
-        (range ? ' | ' + range : '') +
+    return description+
+        (range?' | '+range:'')+
         ' | Cierre mensual: 26–25';
 }
 
-function csvFile(name, headers, data, scope = '') {
+function csvFile(name,headers,data,scope=''){
     const quote = value =>
-        '"' + String(value ?? '').replace(/"/g, '""') + '"';
+        '"'+String(value??'').replace(/"/g,'""')+'"';
 
     const filterRow = Array(headers.length).fill('');
-
     filterRow[0] =
-        'Filtros aplicados: ' +
-        appliedFiltersText() +
-        (scope ? ' | ' + scope : '');
+        'Filtros aplicados: '+appliedFiltersText()+
+        (scope?' | '+scope:'');
 
-    const text = '\uFEFF' +
-        [filterRow, headers, ...data]
-            .map(row => row.map(quote).join(';'))
-            .join('\r\n');
+    const text = '\uFEFF'+[filterRow,headers,...data]
+        .map(row => row.map(quote).join(';')).join('\r\n');
 
     const url = URL.createObjectURL(
-        new Blob([text], {type: 'text/csv;charset=utf-8'})
+        new Blob([text],{type:'text/csv;charset=utf-8'})
     );
 
     const link = document.createElement('a');
     link.href = url;
     link.download = name;
     link.click();
-
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setTimeout(() => URL.revokeObjectURL(url),1000);
 }
 
-function csvNumber(value) {
-    return Number(value).toFixed(2).replace('.', ',');
+const csvInteger = value => Number(value).toFixed(0);
+const csvDecimal = value => Number(value).toFixed(2).replace('.',',');
+
+function exportPlates(metric){
+    const total = totals(filtered);
+
+    const data = orderedPlates(metric).map((group,index) => [
+        index+1,group.id,group.fleteros,group.viajes,
+        csvInteger(group.km),csvInteger(group.km_viaje)
+    ]);
+
+    data.push([
+        '','TOTAL FILTRADO','',total.viajes,
+        csvInteger(total.km),csvInteger(total.km_viaje)
+    ]);
+
+    csvFile(
+        metric === 'km'?'RankingPorKilometros.csv':'RankingPorViajes.csv',
+        ['Puesto','Matrícula','Fletero','Viajes','Kilómetros','Km / viaje'],
+        data,
+        'Vista: Por matrícula'
+    );
 }
 
-function csvInteger(value) {
-    return Number(value).toFixed(0);
+function exportCompanies(){
+    const total = totals(filtered);
+
+    const data = companyRanking.map((group,index) => [
+        index+1,group.id,group.matriculas,
+        csvInteger(group.km_camion),csvInteger(group.km),
+        group.viajes,csvInteger(group.km_viaje)
+    ]);
+
+    data.push([
+        '','TOTAL GENERAL',total.matriculas,
+        csvInteger(total.km_camion),csvInteger(total.km),
+        total.viajes,csvInteger(total.km_viaje)
+    ]);
+
+    csvFile(
+        'RankingPorEmpresa.csv',
+        [
+            'Puesto','Empresa','Cantidad de matrículas','Km por camión',
+            'Kilómetros','Viajes','Km / viaje'
+        ],
+        data,
+        'Vista: Por empresa | Orden: Km por camión descendente'
+    );
 }
 
-function validate(data) {
-    if (data.version_esquema !== 1 || !Array.isArray(data.datos)) {
-        throw Error(
-            'Usá el JSON generado por exportar_ranking_viajes.py.'
-        );
+function validate(data){
+    if(data.version_esquema !== 1 || !Array.isArray(data.datos)){
+        throw Error('El JSON no tiene el formato esperado.');
     }
 
     const ids = new Set();
 
-    return data.datos.map((row, index) => {
+    return data.datos.map((row,index) => {
         const required = [
-            'viaje_id',
-            'fecha',
-            'anio',
-            'mes_numero',
-            'matricula',
-            'origen',
-            'deposito',
-            'nombres_fas',
-            'fleteros',
-            'remitos',
-            'cantidad_remitos',
-            'toneladas',
-            'distancia_km',
-            'distancias_distintas',
+            'viaje_id','fecha','anio','mes_numero','matricula',
+            'origen','deposito','fleteros','remitos','cantidad_remitos',
+            'toneladas','distancia_km','distancias_distintas',
             'registros_sin_toneladas'
         ];
 
-        if (!row || required.some(key => !(key in row))) {
-            throw Error('Faltan datos en el viaje ' + (index + 1));
+        if(!row || required.some(key => !(key in row))){
+            throw Error('Faltan datos en el viaje '+(index+1));
         }
 
-        if (ids.has(row.viaje_id)) {
-            throw Error('Hay un viaje_id duplicado. Regenerá el JSON.');
+        if(ids.has(row.viaje_id)){
+            throw Error('Hay un viaje duplicado: '+row.viaje_id);
         }
-
         ids.add(row.viaje_id);
 
-        if (
-            !/^\d{4}-\d{2}-\d{2}$/.test(row.fecha) ||
+        if(
+            typeof row.fecha !== 'string' ||
             row.fecha < '2025-01-01' ||
             !row.matricula ||
-            normalizeText(row.origen) === 'sin origen'
-        ) {
-            throw Error('Viaje fuera de las reglas: ' + row.viaje_id);
-        }
+            normalize(row.origen) === 'sin origen'
+        ) throw Error('Viaje fuera de las reglas: '+row.viaje_id);
 
-        if (
+        if(
             typeof row.distancia_km !== 'number' ||
             !Number.isFinite(row.distancia_km) ||
             row.distancia_km <= 0 ||
             typeof row.toneladas !== 'number' ||
-            !Number.isFinite(row.toneladas)
-        ) {
-            throw Error(
-                'Kilómetros o toneladas inválidos en ' + row.viaje_id
-            );
-        }
-
-        if (
+            !Number.isFinite(row.toneladas) ||
+            !Array.isArray(row.fleteros) ||
             !Array.isArray(row.remitos) ||
             !row.remitos.length ||
-            !Array.isArray(row.nombres_fas) ||
-            !Array.isArray(row.fleteros) ||
-            row.cantidad_remitos !== row.remitos.length ||
-            !Number.isInteger(row.mes_numero) ||
-            row.mes_numero < 1 ||
-            row.mes_numero > 12
-        ) {
-            throw Error('Formato incorrecto en ' + row.viaje_id);
-        }
+            row.cantidad_remitos !== row.remitos.length
+        ) throw Error('Datos inválidos en el viaje '+row.viaje_id);
 
         return {
             ...row,
-            anio_calendario: row.anio,
-            mes_calendario: row.mes_numero,
+            empresa:companyForRow(row),
+            anio_calendario:row.anio,
+            mes_calendario:row.mes_numero,
             ...periodForDate(row.fecha)
         };
     });
 }
 
-function accept(data) {
-    const parsed = validate(data);
-
-    rows = parsed;
-    loaded = true;
-
-    for (const key of filters) {
-        selected[key] = null;
-        search[key] = '';
-        $('search-' + key).value = '';
-    }
-
-    $('updated').textContent =
-        'Datos actualizados: ' +
-        (data.actualizado || 'No informado') +
-        ' · Desde 01/01/2025';
-
-    if ($('details').open) {
-        $('details').close();
-    }
-
-    apply();
-}
-
-async function load() {
-    if (busy) return;
-
+async function load(){
+    if(busy) return;
     busy = true;
     $('refresh').disabled = true;
-
     status('Cargando viajes y distancias…');
 
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 120000);
+    const timer = setTimeout(() => controller.abort(),120000);
 
-    try {
-        const response = await fetch(URL_JSON, {
-            cache: 'no-store',
-            signal: controller.signal
+    try{
+        const response = await fetch(URL_JSON,{
+            cache:'no-store',signal:controller.signal
         });
 
-        if (!response.ok) {
-            throw Error('HTTP ' + response.status);
+        if(!response.ok) throw Error('HTTP '+response.status);
+
+        const data = await response.json();
+        const parsed = validate(data);
+
+        rows = parsed;
+        loaded = true;
+
+        for(const key of filterKeys){
+            selected[key] = null;
+            search[key] = '';
+            $('search-'+key).value = '';
         }
 
-        accept(await response.json());
-    } catch (error) {
+        $('updated').textContent =
+            'Datos actualizados: '+(data.actualizado || 'No informado')+
+            ' · Desde 01/01/2025';
+
+        apply();
+    }catch(error){
         status(
-            (loaded ? 'Se conservan los datos anteriores. ' : '') +
-            'No se pudieron cargar los datos: ' +
-            (
-                error.name === 'AbortError'
-                    ? 'tiempo de espera agotado.'
-                    : error.message
-            ),
+            (loaded?'Se conservan los datos anteriores. ':'')+
+            'No se pudieron cargar los datos: '+
+            (error.name === 'AbortError'
+                ? 'tiempo de espera agotado.'
+                : error.message),
             true
         );
-    } finally {
+    }finally{
         clearTimeout(timer);
         busy = false;
         $('refresh').disabled = false;
     }
 }
 
-for (const [prefix, metric] of [
-    ['km', 'km'],
-    ['trips', 'viajes']
-]) {
-    const first = document.createElement('th');
-    first.textContent = 'Puesto';
-
-    $(prefix + '-headers').append(first);
-
-    cols.forEach((key, index) => {
-        const th = document.createElement('th');
-
-        th.textContent =
-            headings[index] + (key === metric ? ' ▼' : '');
-
-        if (key === metric) {
-            th.setAttribute('aria-sort', 'descending');
-        }
-
-        $(prefix + '-headers').append(th);
-    });
-
-    $(prefix + '-csv').onclick = () => {
-        const total = totals(filtered);
-        const list = orderedRanking(metric);
-
-        const data = list.map((row, index) => [
-            index + 1,
-            ...cols.map(key => {
-                if (['matricula', 'fleteros'].includes(key)) {
-                    return row[key];
-                }
-
-                if (key === 'viajes') {
-                    return row[key];
-                }
-
-                if (['km', 'km_viaje'].includes(key)) {
-                    return csvInteger(row[key]);
-                }
-
-                return csvNumber(row[key]);
-            })
-        ]);
-
-        data.push([
-            '',
-            'TOTAL FILTRADO',
-            '',
-            total.viajes,
-            csvInteger(total.km),
-            csvInteger(total.km_viaje)
-        ]);
-
-        csvFile(
-            prefix === 'km'
-                ? 'RankingPorKilometros.csv'
-                : 'RankingPorViajes.csv',
-            ['Puesto', ...headings],
-            data
-        );
-    };
-}
-
 buildFilters();
 
+$('view-plates').onclick = () => switchView('plates');
+$('view-companies').onclick = () => switchView('companies');
+
 $('clear').onclick = () => {
-    for (const key of filters) {
+    for(const key of filterKeys){
         selected[key] = null;
         search[key] = '';
-        $('search-' + key).value = '';
+        $('search-'+key).value = '';
     }
-
     apply();
 };
 
-$('detail-close').onclick = () => $('details').close();
 $('refresh').onclick = load;
+$('detail-close').onclick = () => $('details').close();
+$('km-csv').onclick = () => exportPlates('km');
+$('trips-csv').onclick = () => exportPlates('viajes');
+$('company-csv').onclick = exportCompanies;
 
-$('detail-csv').onclick = () => {
-    csvFile(
-        'DetalleViajes.csv',
-        [
-            'Fecha',
-            'Remitos',
-            'Matrícula',
-            'Fletero',
-            'Origen',
-            'Depósito',
-            'Toneladas',
-            'Km'
-        ],
-        detailRows.map(row => [
-            dateLabel(row.fecha),
-            row.remitos.join(', '),
-            row.matricula,
-            row.fleteros.join(' / '),
-            row.origen,
-            row.deposito,
-            csvNumber(row.toneladas),
-            csvInteger(row.distancia_km)
-        ]),
-        'Matrícula consultada: ' + (detailRows[0]?.matricula || '—')
-    );
-};
+$('detail-csv').onclick = () => csvFile(
+    'DetalleViajes.csv',
+    [
+        'Fecha','Remitos','Matrícula','Fletero','Origen',
+        'Depósito','Toneladas','Km'
+    ],
+    detailRows.map(row => [
+        dateLabel(row.fecha),row.remitos.join(', '),
+        row.matricula,row.fleteros.join(' / '),
+        row.origen,row.deposito,
+        csvDecimal(row.toneladas),csvInteger(row.distancia_km)
+    ]),
+    detailScope
+);
 
 render();
 load();
