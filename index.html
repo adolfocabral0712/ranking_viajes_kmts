@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ranking de viajes y kilómetros</title>
+
+<style>
+:root{--green:#164b3c;--border:#dbe5df;--muted:#65796e}
+*{box-sizing:border-box}
+body{margin:0;background:#f2f6f3;color:#21372b;font:14px Arial,sans-serif}
+main{max-width:1500px;margin:auto;padding:24px}
+header,.tools,.pager{display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{margin:0 0 7px;font-size:26px}
+h2{font-size:19px;margin:0}
+p{color:var(--muted);line-height:1.5;margin:6px 0}
+button,input{font:inherit;padding:10px;border:1px solid var(--border);border-radius:7px;background:white;color:#21372b}
+button{cursor:pointer}
+button.primary,button.active{background:var(--green);color:white}
+button:disabled{opacity:.45;cursor:default}
+.filters,.panel,.card{background:white;border:1px solid var(--border);border-radius:12px}
+.filters{padding:14px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin:20px 0 18px;position:relative}
+.multi{position:relative;min-width:0}
+.multi summary{font-weight:bold;padding:11px;border:1px solid var(--border);border-radius:7px;font-size:12px;cursor:pointer;overflow-wrap:anywhere}
+.multi[open]{z-index:12}
+.popup{position:absolute;top:calc(100% + 6px);left:0;width:280px;max-width:calc(100vw - 40px);background:white;padding:10px;border:1px solid var(--border);border-radius:10px;box-shadow:0 10px 25px #164b3c25}
+.search{width:100%;margin-bottom:8px}
+.filter-actions{display:flex;gap:6px}
+.filter-actions button{flex:1;font-size:11px;padding:7px}
+.choices{max-height:260px;overflow:auto;margin-top:7px}
+.choice{display:flex;gap:9px;padding:8px 4px;align-items:center;cursor:pointer;font-size:12px}
+.choice input{accent-color:var(--green);width:17px;height:17px;padding:0;margin:0}
+.choice[hidden]{display:none}
+.cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.card{text-align:center;padding:16px;border-top:3px solid var(--green)}
+.card span{font-size:12px;color:var(--muted)}
+.card strong{display:block;font-size:25px;margin-top:8px}
+.tools{padding:14px;flex-wrap:wrap}
+.switch{display:flex;gap:6px}
+.scroll{overflow:auto;max-height:65vh}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{text-align:center;padding:12px 8px;border-bottom:1px solid #e5ece7}
+th{background:var(--green);color:white;position:sticky;top:0;z-index:1}
+th button{border:0;background:none;color:inherit;font-size:12px;font-weight:bold;padding:0}
+tbody tr:nth-child(even){background:#f7faf8}
+tbody tr:hover{background:#eef5f0}
+td.long{max-width:240px;overflow-wrap:anywhere}
+tfoot{font-weight:bold;background:#e4eee8}
+.pager{justify-content:center;padding:12px}
+#status{margin:12px 0;line-height:1.5}
+.error{color:#a52e2e}
+.note{font-size:12px;margin-top:14px}
+.pill{font-size:11px;padding:3px 6px;border-radius:4px;background:#fff0c8;color:#795a16;display:inline-block;margin-top:5px}
+dialog{border:1px solid var(--border);border-radius:14px;width:min(1250px,96vw);max-height:92vh;padding:0;color:#21372b}
+dialog::backdrop{background:#122d2466}
+.dialog-head{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:18px;position:sticky;top:0;background:white;z-index:5}
+.dialog-body{padding:0 18px 18px}
+.dialog-body h3{margin:20px 0 10px}
+.dialog-body .scroll{max-height:45vh}
+#detail-close{font-size:24px;padding:3px 10px}
+.small{font-size:11px}
+
+@media(max-width:950px){
+ .filters{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:650px){
+ main{padding:12px}
+ header{align-items:flex-start;flex-direction:column}
+ h1{font-size:22px}
+ .filters,.cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .card strong{font-size:22px}
+ .multi:nth-child(even) .popup{left:auto;right:0}
+ table{min-width:850px}
+ .tools{align-items:flex-start;flex-direction:column}
+}
+</style>
+</head>
+
+<body>
+<main>
+
+<header>
+ <div>
+  <h1>Ranking de viajes y kilómetros</h1>
+  <p id="updated">Desde enero de 2025 · kilómetros de ida registrados</p>
+ </div>
+ <div>
+  <button id="clear">Limpiar filtros</button>
+  <button class="primary" id="refresh">Actualizar</button>
+ </div>
+</header>
+
+<section class="filters" id="filters" aria-label="Filtros"></section>
+
+<section class="cards">
+ <div class="card">
+  <span>Matrículas utilizadas</span>
+  <strong id="k-plates">—</strong>
+ </div>
+ <div class="card">
+  <span>Viajes</span>
+  <strong id="k-trips">—</strong>
+ </div>
+ <div class="card">
+  <span>Kilómetros registrados</span>
+  <strong id="k-km">—</strong>
+ </div>
+ <div class="card">
+  <span>Toneladas transportadas</span>
+  <strong id="k-tons">—</strong>
+ </div>
+ <div class="card">
+  <span>Kilómetros / viaje</span>
+  <strong id="k-average">—</strong>
+ </div>
+</section>
+
+<div id="status" role="status" aria-live="polite">
+ Cargando viajes y distancias…
+</div>
+
+<section class="panel">
+ <div class="tools">
+  <b id="count">Ranking por matrícula</b>
+
+  <div class="switch">
+   <button id="by-km" class="active" aria-pressed="true">
+    Por kilómetros
+   </button>
+   <button id="by-trips" aria-pressed="false">
+    Por viajes
+   </button>
+  </div>
+
+  <button id="csv" disabled>Exportar ranking CSV</button>
+ </div>
+
+ <div class="scroll">
+  <table>
+   <thead><tr id="headers"></tr></thead>
+   <tbody id="body"></tbody>
+   <tfoot id="footer"></tfoot>
+  </table>
+ </div>
+
+ <div class="pager">
+  <button id="prev">Anterior</button>
+  <span id="page">Página 1 de 1</span>
+  <button id="next">Siguiente</button>
+ </div>
+</section>
+
+<p class="note">
+ Solo entradas desde 01/01/2025 con distancia positiva,
+ matrícula válida y origen informado.
+ Viaje estimado: misma matrícula, día, origen y depósito,
+ con hasta 10 números entre el menor y el mayor remito del grupo.
+ Se suman las toneladas y se toma la mayor distancia una sola vez.
+ El agrupamiento se realiza antes de filtrar.
+ Los kilómetros son distancias de ruta registradas, no mediciones GPS.
+ Un filtro de fletero o Nombre FAS incluye el viaje completo si contiene
+ alguna de las opciones seleccionadas.
+</p>
+
+</main>
+
+<dialog id="details">
+ <div class="dialog-head">
+  <div>
+   <h2 id="detail-title"></h2>
+   <p id="detail-subtitle"></p>
+  </div>
+  <button id="detail-close" aria-label="Cerrar">×</button>
+ </div>
+
+ <div class="dialog-body">
+  <h3>Resumen por origen</h3>
+
+  <div class="scroll">
+   <table>
+    <thead>
+     <tr>
+      <th>Origen</th>
+      <th>Viajes</th>
+      <th>Kilómetros</th>
+      <th>Toneladas</th>
+      <th>Km / viaje</th>
+      <th>t / viaje</th>
+     </tr>
+    </thead>
+    <tbody id="origin-body"></tbody>
+   </table>
+  </div>
+
+  <h3>Viajes del período seleccionado</h3>
+
+  <p class="small">
+   Cuando hay varios remitos, la distancia mostrada es la máxima del grupo.
+  </p>
+
+  <div class="scroll">
+   <table>
+    <thead>
+     <tr>
+      <th>Fecha</th>
+      <th>Remitos</th>
+      <th>Matrícula</th>
+      <th>Fletero</th>
+      <th>Origen</th>
+      <th>Depósito</th>
+      <th>Toneladas</th>
+      <th>Km</th>
+     </tr>
+    </thead>
+    <tbody id="detail-body"></tbody>
+   </table>
+  </div>
+
+  <div class="pager">
+   <button id="detail-prev">Anterior</button>
+   <span id="detail-page"></span>
+   <button id="detail-next">Siguiente</button>
+  </div>
+
+  <button id="detail-csv">Exportar viajes CSV</button>
+ </div>
+</dialog>
+
+<script>
+'use strict';
+
+const URL_JSON =
+'https://dl.dropbox.com/scl/fi/c6r2wfa9wkl5ciwz30si8/RankingViajesDistancia.json?rlkey=m5t2qg20chg818ydyi8axcir3&dl=1';
+
+const $=id=>document.getElementById(id);
+
+const months=[
+ 'ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO',
+ 'JULIO','AGOSTO','SETIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'
+];
+
+const filters=[
+ 'anio',
+ 'mes_numero',
+ 'nombres_fas',
+ 'deposito',
+ 'matricula',
+ 'fleteros'
+];
+
+const labels={
+ anio:'Año',
+ mes_numero:'Nombre del mes',
+ nombres_fas:'Nombre FAS',
+ deposito:'Depósito',
+ matricula:'Matrícula',
+ fleteros:'Fletero'
+};
+
+const selected=Object.fromEntries(
+ filters.map(k=>[k,null])
+);
+
+const search=Object.fromEntries(
+ filters.map(k=>[k,''])
+);
+
+const cols=[
+ 'matricula',
+ 'fleteros',
+ 'viajes',
+ 'km',
+ 'tons',
+ 'km_viaje',
+ 'tons_viaje'
+];
+
+const headings=[
+ 'Matrícula',
+ 'Fletero',
+ 'Viajes',
+ 'Kilómetros',
+ 'Toneladas',
+ 'Km / viaje',
+ 't / viaje'
+];
+
+const fmt=new Intl.NumberFormat('es-UY',{
+ minimumFractionDigits:2,
+ maximumFractionDigits:2
+});
+
+const integer=new Intl.NumberFormat('es-UY');
+
+const PAGE=50;
+const DETAIL_PAGE=100;
+
+let rows=[];
+let filtered=[];
+let ranking=[];
+let sortKey='km';
+let direction=-1;
+let page=0;
+let loaded=false;
+let busy=false;
+
+let detailRows=[];
+let detailPage=0;
+
+// ============================================================
+// FUNCIONES GENERALES
+// ============================================================
+
+function normalizeText(v){
+ return String(v??'')
+  .trim()
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g,'')
+  .toLocaleLowerCase('es');
+}
+
+function compare(a,b){
+ return String(a).localeCompare(String(b),'es',{
+  numeric:true,
+  sensitivity:'base'
+ });
+}
+
+function values(r,k){
+ return Array.isArray(r[k])
+  ?r[k].map(String)
+  :[String(r[k]??'')];
+}
+
+function valueLabel(k,v){
+ return k==='mes_numero'
+  ?months[Number(v)-1]||v
+  :v||'(Sin dato)';
+}
+
+function matches(r,except){
+ return filters.every(k=>
+  k===except||
+  selected[k]===null||
+  values(r,k).some(v=>selected[k].has(v))
+ );
+}
+
+function status(message,error=false){
+ $('status').textContent=message;
+ $('status').classList.toggle('error',error);
+}
+
+function td(tr,value,klass){
+ const node=document.createElement('td');
+ node.textContent=value;
+ if(klass)node.className=klass;
+ tr.append(node);
+ return node;
+}
+
+function dateLabel(v){
+ const p=v.split('-');
+ return p[2]+'/'+p[1]+'/'+p[0];
+}
+
+function display(k,v){
+ if(['viajes','puesto'].includes(k)){
+  return integer.format(v);
+ }
+
+ if(['km','tons','km_viaje','tons_viaje'].includes(k)){
+  return fmt.format(v);
+ }
+
+ return String(v||'—');
+}
+
+// ============================================================
+// FILTROS MÚLTIPLES CON BÚSQUEDA
+// ============================================================
+
+function filterVisible(k){
+ const query=normalizeText(search[k]);
+
+ document.querySelectorAll(
+  '#choices-'+k+' .choice'
+ ).forEach(label=>{
+  label.hidden=!normalizeText(label.textContent).includes(query);
+ });
+}
+
+function options(){
+ for(const k of filters){
+  const all=[
+   ...new Set(rows.flatMap(r=>values(r,k)))
+  ].sort(compare);
+
+  const box=$('choices-'+k);
+  box.replaceChildren();
+
+  for(const v of all){
+   const label=document.createElement('label');
+   label.className='choice';
+
+   const input=document.createElement('input');
+   input.type='checkbox';
+
+   input.checked=
+    selected[k]===null||selected[k].has(v);
+
+   input.onchange=()=>{
+    if(selected[k]===null){
+     selected[k]=new Set(all);
+    }
+
+    if(input.checked){
+     selected[k].add(v);
+    }else{
+     selected[k].delete(v);
+    }
+
+    if(selected[k].size===all.length){
+     selected[k]=null;
+    }
+
+    apply();
+   };
+
+   const span=document.createElement('span');
+   span.textContent=valueLabel(k,v);
+
+   label.append(input,span);
+   box.append(label);
+  }
+
+  const count=selected[k]===null
+   ?all.length
+   :selected[k].size;
+
+  $('summary-'+k).textContent=
+   labels[k]+': '+
+   (selected[k]===null
+    ?'Todos'
+    :count===0?'Ninguno':count+' seleccionados');
+
+  filterVisible(k);
+ }
+}
+
+function buildFilters(){
+ for(const k of filters){
+  const d=document.createElement('details');
+  d.className='multi';
+
+  const title=document.createElement('summary');
+  title.id='summary-'+k;
+  title.textContent=labels[k]+': Todos';
+
+  const popup=document.createElement('div');
+  popup.className='popup';
+
+  const input=document.createElement('input');
+  input.type='search';
+  input.id='search-'+k;
+  input.className='search';
+  input.placeholder='Buscar coincidencias…';
+  input.setAttribute('aria-label','Buscar '+labels[k]);
+
+  input.oninput=()=>{
+   search[k]=input.value;
+   filterVisible(k);
+  };
+
+  const actions=document.createElement('div');
+  actions.className='filter-actions';
+
+  const all=document.createElement('button');
+  all.textContent='Marcar todas';
+  all.onclick=()=>{
+   selected[k]=null;
+   apply();
+  };
+
+  const none=document.createElement('button');
+  none.textContent='Quitar todas';
+  none.onclick=()=>{
+   selected[k]=new Set();
+   apply();
+  };
+
+  actions.append(all,none);
+
+  const choices=document.createElement('div');
+  choices.className='choices';
+  choices.id='choices-'+k;
+
+  popup.append(input,actions,choices);
+  d.append(title,popup);
+  $('filters').append(d);
+ }
+
+ document.addEventListener('click',e=>{
+  document.querySelectorAll('.multi[open]').forEach(d=>{
+   if(!d.contains(e.target))d.open=false;
+  });
+ });
+
+ document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+   document.querySelectorAll('.multi[open]').forEach(
+    d=>d.open=false
+   );
+  }
+ });
+}
+
+// ============================================================
+// CÁLCULOS
+// ============================================================
+
+function summarize(source,key){
+ const map=new Map();
+
+ for(const r of source){
+  const id=r[key];
+
+  if(!map.has(id)){
+   map.set(id,{
+    [key]:id,
+    viajes:0,
+    km:0,
+    tons:0,
+    fleterosSet:new Set()
+   });
+  }
+
+  const g=map.get(id);
+
+  g.viajes++;
+  g.km+=r.distancia_km;
+  g.tons+=r.toneladas;
+
+  for(const name of r.fleteros){
+   g.fleterosSet.add(name);
+  }
+ }
+
+ return [...map.values()].map(g=>({
+  ...g,
+  fleteros:[...g.fleterosSet].sort(compare).join(' / '),
+  km_viaje:g.km/g.viajes,
+  tons_viaje:g.tons/g.viajes
+ }));
+}
+
+function totals(source){
+ const t={
+  viajes:source.length,
+  km:0,
+  tons:0
+ };
+
+ for(const r of source){
+  t.km+=r.distancia_km;
+  t.tons+=r.toneladas;
+ }
+
+ t.km_viaje=t.viajes?t.km/t.viajes:0;
+ t.tons_viaje=t.viajes?t.tons/t.viajes:0;
+
+ return t;
+}
+
+// ============================================================
+// RANKING Y TARJETAS
+// ============================================================
+
+function render(){
+ ranking.sort((a,b)=>{
+  const diff=['matricula','fleteros'].includes(sortKey)
+   ?compare(a[sortKey],b[sortKey])
+   :a[sortKey]-b[sortKey];
+
+  return direction*diff||
+   b.km-a.km||
+   b.viajes-a.viajes||
+   compare(a.matricula,b.matricula);
+ });
+
+ const t=totals(filtered);
+
+ $('k-plates').textContent=
+  loaded?integer.format(ranking.length):'—';
+
+ $('k-trips').textContent=
+  loaded?integer.format(t.viajes):'—';
+
+ $('k-km').textContent=
+  loaded?fmt.format(t.km):'—';
+
+ $('k-tons').textContent=
+  loaded?fmt.format(t.tons):'—';
+
+ $('k-average').textContent=
+  loaded?fmt.format(t.km_viaje):'—';
+
+ $('body').replaceChildren();
+
+ ranking.slice(
+  page*PAGE,
+  (page+1)*PAGE
+ ).forEach((g,i)=>{
+  const tr=document.createElement('tr');
+
+  td(tr,integer.format(page*PAGE+i+1));
+
+  for(const k of cols){
+   td(
+    tr,
+    display(k,g[k]),
+    k==='fleteros'?'long':''
+   );
+  }
+
+  const cell=td(tr,'');
+  const button=document.createElement('button');
+  button.textContent='Ver orígenes y viajes';
+  button.onclick=()=>openDetail(g.matricula);
+  cell.append(button);
+
+  $('body').append(tr);
+ });
+
+ if(!ranking.length){
+  const tr=document.createElement('tr');
+
+  const cell=td(
+   tr,
+   loaded
+    ?'No hay viajes para estos filtros.'
+    :'Esperando datos…'
+  );
+
+  cell.colSpan=9;
+  $('body').append(tr);
+ }
+
+ const totalRow=document.createElement('tr');
+ const title=td(totalRow,'TOTAL FILTRADO');
+ title.colSpan=3;
+
+ for(const k of [
+  'viajes','km','tons','km_viaje','tons_viaje'
+ ]){
+  td(totalRow,display(k,t[k]));
+ }
+
+ td(totalRow,'');
+ $('footer').replaceChildren(totalRow);
+
+ const pages=Math.max(
+  1,
+  Math.ceil(ranking.length/PAGE)
+ );
+
+ $('page').textContent=
+  'Página '+(page+1)+' de '+pages;
+
+ $('prev').disabled=page===0;
+ $('next').disabled=page+1>=pages;
+ $('csv').disabled=!ranking.length;
+
+ $('count').textContent=
+  'Ranking por matrícula · '+ranking.length+' camiones';
+
+ document.querySelectorAll(
+  '#headers th[data-key]'
+ ).forEach(th=>{
+  const key=th.dataset.key;
+
+  th.firstChild.textContent=
+   headings[cols.indexOf(key)]+
+   (sortKey===key?(direction===1?' ▲':' ▼'):'');
+
+  th.setAttribute(
+   'aria-sort',
+   sortKey===key
+    ?direction===1?'ascending':'descending'
+    :'none'
+  );
+ });
+
+ for(const [id,key] of [
+  ['by-km','km'],
+  ['by-trips','viajes']
+ ]){
+  $(id).classList.toggle('active',sortKey===key);
+  $(id).setAttribute(
+   'aria-pressed',
+   String(sortKey===key)
+  );
+ }
+}
+
+function apply(){
+ options();
+
+ filtered=rows.filter(r=>matches(r));
+ ranking=summarize(filtered,'matricula');
+ page=0;
+
+ render();
+
+ if(loaded){
+  const refs=filtered.reduce(
+   (n,r)=>n+r.cantidad_remitos,
+   0
+  );
+
+  const mixed=filtered.filter(
+   r=>r.distancias_distintas
+  ).length;
+
+  const missing=filtered.reduce(
+   (n,r)=>n+r.registros_sin_toneladas,
+   0
+  );
+
+  status(
+   integer.format(filtered.length)+' viajes · '+
+   integer.format(refs)+' remitos · '+
+   mixed+' viajes con distancias distintas '+
+   '(se tomó la mayor)'+
+   (missing
+    ?' · '+missing+
+     ' remitos sin toneladas: total de toneladas incompleto.'
+    :'.')
+  );
+ }
+}
+
+// ============================================================
+// DETALLE POR MATRÍCULA
+// ============================================================
+
+function renderDetail(){
+ const box=$('detail-body');
+ box.replaceChildren();
+
+ for(const r of detailRows.slice(
+  detailPage*DETAIL_PAGE,
+  (detailPage+1)*DETAIL_PAGE
+ )){
+  const tr=document.createElement('tr');
+
+  td(tr,dateLabel(r.fecha));
+  td(tr,r.remitos.join(', '),'long');
+  td(tr,r.matricula);
+  td(tr,r.fleteros.join(' / '),'long');
+  td(tr,r.origen,'long');
+  td(tr,r.deposito,'long');
+  td(tr,fmt.format(r.toneladas));
+
+  const cell=td(tr,fmt.format(r.distancia_km));
+
+  if(r.distancias_distintas){
+   const flag=document.createElement('span');
+   flag.className='pill';
+   flag.textContent='Máxima del grupo';
+   cell.append(document.createElement('br'),flag);
+  }
+
+  box.append(tr);
+ }
+
+ const pages=Math.max(
+  1,
+  Math.ceil(detailRows.length/DETAIL_PAGE)
+ );
+
+ $('detail-page').textContent=
+  'Página '+(detailPage+1)+' de '+pages;
+
+ $('detail-prev').disabled=detailPage===0;
+ $('detail-next').disabled=detailPage+1>=pages;
+}
+
+function openDetail(plate){
+ detailRows=filtered.filter(
+  r=>r.matricula===plate
+ ).sort((a,b)=>
+  compare(b.fecha,a.fecha)||
+  compare(a.remitos[0],b.remitos[0])
+ );
+
+ detailPage=0;
+
+ const t=totals(detailRows);
+
+ $('detail-title').textContent=
+  plate+' · Orígenes y viajes';
+
+ $('detail-subtitle').textContent=
+  integer.format(t.viajes)+' viajes · '+
+  fmt.format(t.km)+' km · '+
+  fmt.format(t.tons)+' t';
+
+ $('origin-body').replaceChildren();
+
+ for(const g of summarize(
+  detailRows,
+  'origen'
+ ).sort((a,b)=>b.km-a.km)){
+  const tr=document.createElement('tr');
+
+  td(tr,g.origen,'long');
+
+  for(const k of [
+   'viajes','km','tons','km_viaje','tons_viaje'
+  ]){
+   td(tr,display(k,g[k]));
+  }
+
+  $('origin-body').append(tr);
+ }
+
+ renderDetail();
+ $('details').showModal();
+}
+
+// ============================================================
+// EXPORTACIÓN CSV
+// ============================================================
+
+function csvFile(name,headers,data){
+ const quote=v=>
+  '"'+String(v??'').replace(/"/g,'""')+'"';
+
+ const csv='\uFEFF'+[
+  headers,
+  ...data
+ ].map(r=>r.map(quote).join(';')).join('\r\n');
+
+ const url=URL.createObjectURL(
+  new Blob([csv],{
+   type:'text/csv;charset=utf-8'
+  })
+ );
+
+ const a=document.createElement('a');
+ a.href=url;
+ a.download=name;
+ a.click();
+
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+function csvNumber(v){
+ return Number(v).toFixed(2).replace('.',',');
+}
+
+// ============================================================
+// VALIDACIÓN DEL JSON
+// ============================================================
+
+function validate(data){
+ if(
+  data.version_esquema!==1||
+  !Array.isArray(data.datos)
+ ){
+  throw Error(
+   'El JSON no tiene el formato de RankingViajesDistancia.'
+  );
+ }
+
+ const ids=new Set();
+
+ return data.datos.map((r,i)=>{
+  const required=[
+   'viaje_id',
+   'fecha',
+   'anio',
+   'mes_numero',
+   'matricula',
+   'origen',
+   'deposito',
+   'nombres_fas',
+   'fleteros',
+   'remitos',
+   'cantidad_remitos',
+   'toneladas',
+   'distancia_km',
+   'distancias_distintas',
+   'registros_sin_toneladas'
+  ];
+
+  if(!r||required.some(k=>!(k in r))){
+   throw Error('Faltan datos en el viaje '+(i+1));
+  }
+
+  if(ids.has(r.viaje_id)){
+   throw Error(
+    'Hay un viaje_id duplicado. Regenerá el JSON.'
+   );
+  }
+
+  ids.add(r.viaje_id);
+
+  if(
+   !/^\d{4}-\d{2}-\d{2}$/.test(r.fecha)||
+   r.fecha<'2025-01-01'||
+   !r.matricula||
+   normalizeText(r.origen)==='sin origen'
+  ){
+   throw Error(
+    'Viaje fuera de las reglas: '+r.viaje_id
+   );
+  }
+
+  if(
+   typeof r.distancia_km!=='number'||
+   !Number.isFinite(r.distancia_km)||
+   r.distancia_km<=0||
+   typeof r.toneladas!=='number'||
+   !Number.isFinite(r.toneladas)
+  ){
+   throw Error(
+    'Kilómetros o toneladas inválidos en '+r.viaje_id
+   );
+  }
+
+  if(
+   !Array.isArray(r.remitos)||
+   !r.remitos.length||
+   !Array.isArray(r.nombres_fas)||
+   !Array.isArray(r.fleteros)||
+   r.cantidad_remitos!==r.remitos.length||
+   !Number.isInteger(r.mes_numero)||
+   r.mes_numero<1||
+   r.mes_numero>12
+  ){
+   throw Error(
+    'Formato incorrecto en '+r.viaje_id
+   );
+  }
+
+  return r;
+ });
+}
+
+function accept(data){
+ const parsed=validate(data);
+
+ rows=parsed;
+ loaded=true;
+
+ for(const k of filters){
+  selected[k]=null;
+  search[k]='';
+  $('search-'+k).value='';
+ }
+
+ $('updated').textContent=
+  'Datos actualizados: '+
+  (data.actualizado||'No informado')+
+  ' · Desde 01/01/2025';
+
+ if($('details').open){
+  $('details').close();
+ }
+
+ apply();
+}
+
+// ============================================================
+// CARGA DIRECTA DESDE DROPBOX
+// ============================================================
+
+async function load(){
+ if(busy)return;
+
+ busy=true;
+ $('refresh').disabled=true;
+ status('Cargando viajes y distancias…');
+
+ const controller=new AbortController();
+
+ const timer=setTimeout(
+  ()=>controller.abort(),
+  120000
+ );
+
+ try{
+  const response=await fetch(URL_JSON,{
+   cache:'no-store',
+   signal:controller.signal
+  });
+
+  if(!response.ok){
+   throw Error('HTTP '+response.status);
+  }
+
+  accept(await response.json());
+
+ }catch(e){
+  status(
+   (loaded?'Se conservan los datos anteriores. ':'')+
+   'No se pudieron cargar los datos: '+
+   (e.name==='AbortError'
+    ?'tiempo de espera agotado.'
+    :e.message),
+   true
+  );
+
+ }finally{
+  clearTimeout(timer);
+  busy=false;
+  $('refresh').disabled=false;
+ }
+}
+
+// ============================================================
+// ENCABEZADOS ORDENABLES
+// ============================================================
+
+const first=document.createElement('th');
+first.textContent='Puesto';
+$('headers').append(first);
+
+cols.forEach((key,i)=>{
+ const th=document.createElement('th');
+ th.dataset.key=key;
+
+ const button=document.createElement('button');
+ button.textContent=headings[i];
+
+ button.onclick=()=>{
+  direction=sortKey===key
+   ?-direction
+   :['matricula','fleteros'].includes(key)?1:-1;
+
+  sortKey=key;
+  page=0;
+  render();
+ };
+
+ th.append(button);
+ $('headers').append(th);
+});
+
+const last=document.createElement('th');
+last.textContent='Detalle';
+$('headers').append(last);
+
+// ============================================================
+// EVENTOS
+// ============================================================
+
+buildFilters();
+
+$('clear').onclick=()=>{
+ for(const k of filters){
+  selected[k]=null;
+  search[k]='';
+  $('search-'+k).value='';
+ }
+
+ apply();
+};
+
+$('by-km').onclick=()=>{
+ sortKey='km';
+ direction=-1;
+ page=0;
+ render();
+};
+
+$('by-trips').onclick=()=>{
+ sortKey='viajes';
+ direction=-1;
+ page=0;
+ render();
+};
+
+$('prev').onclick=()=>{
+ page--;
+ render();
+};
+
+$('next').onclick=()=>{
+ page++;
+ render();
+};
+
+$('detail-close').onclick=()=>{
+ $('details').close();
+};
+
+$('detail-prev').onclick=()=>{
+ detailPage--;
+ renderDetail();
+};
+
+$('detail-next').onclick=()=>{
+ detailPage++;
+ renderDetail();
+};
+
+$('refresh').onclick=load;
+
+$('csv').onclick=()=>{
+ const t=totals(filtered);
+
+ csvFile(
+  'RankingViajesDistancia.csv',
+  ['Puesto',...headings],
+  [
+   ...ranking.map((r,i)=>[
+    i+1,
+    ...cols.map(k=>
+     ['matricula','fleteros'].includes(k)
+      ?r[k]
+      :k==='viajes'?r[k]:csvNumber(r[k])
+    )
+   ]),
+   [
+    '',
+    'TOTAL FILTRADO',
+    '',
+    t.viajes,
+    csvNumber(t.km),
+    csvNumber(t.tons),
+    csvNumber(t.km_viaje),
+    csvNumber(t.tons_viaje)
+   ]
+  ]
+ );
+};
+
+$('detail-csv').onclick=()=>{
+ csvFile(
+  'DetalleViajes.csv',
+  [
+   'Fecha',
+   'Remitos',
+   'Matrícula',
+   'Fletero',
+   'Origen',
+   'Depósito',
+   'Toneladas',
+   'Km'
+  ],
+  detailRows.map(r=>[
+   dateLabel(r.fecha),
+   r.remitos.join(', '),
+   r.matricula,
+   r.fleteros.join(' / '),
+   r.origen,
+   r.deposito,
+   csvNumber(r.toneladas),
+   csvNumber(r.distancia_km)
+  ])
+ );
+};
+
+// ============================================================
+// INICIO
+// ============================================================
+
+render();
+load();
+</script>
+</body>
+</html>
